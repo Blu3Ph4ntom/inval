@@ -1,6 +1,6 @@
 {
   "name": "@blu3ph4ntom/inval",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deterministic, incremental layout invalidation engine",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -51,7 +51,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Blu3ph4ntom/inval.git"
+    "url": "https://github.com/Blu3ph4ntom/inval.git"
   },
   "homepage": "https://github.com/Blu3ph4ntom/inval#readme",
   "bugs": {

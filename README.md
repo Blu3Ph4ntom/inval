@@ -461,12 +461,9 @@ A side-by-side dashboard demo showing the difference between using Inval vs naiv
 - **demo/pure/index.html** — Uses Inval for incremental updates
 - **demo/without-inval/index.html** — Recomputes everything on each change
 
-Watch the video:
-```bash
-# The webm video is available at docs/dashboard-demo.webm
-# Open in browser or convert to view locally
-open docs/dashboard-demo.webm
-```
+![Dashboard Demo](docs/dashboard-final.png)
+
+The left panel uses Inval: notice the cached count stays high after initial computation. The right panel recomputes everything on each change.
 
 ---
 
