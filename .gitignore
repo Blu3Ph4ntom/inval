@@ -1,6 +1,9 @@
 node_modules/
 dist/
 .agent/
+web/node_modules/
+web/dist/
+web/.astro/
 *.tsbuildinfo
 .bun/
 demo/screenshot.ts

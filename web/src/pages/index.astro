@@ -1,0 +1,671 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout title="@blu3ph4ntom/inval - Deterministic, incremental layout invalidation">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="live-dot"></span>
+        <span>npm install @blu3ph4ntom/inval</span>
+      </div>
+      <h1 class="hero-title">
+        Deterministic,<br />
+        incremental layout<br />
+        <em>invalidation.</em>
+      </h1>
+      <p class="hero-sub">
+        Not a framework. Not a renderer.<br />
+        The missing primitive for layout-aware applications.
+      </p>
+      <div class="hero-perf">
+        <div class="perf-row">
+          <span class="perf-label">naive</span>
+          <span class="perf-bar"><span class="perf-bar-fill naive-fill"></span></span>
+          <span class="perf-val">417K ops/s</span>
+        </div>
+        <div class="perf-row">
+          <span class="perf-label">inval</span>
+          <span class="perf-bar"><span class="perf-bar-fill inval-fill"></span></span>
+          <span class="perf-val accent-val">4,230K ops/s</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section" id="problem">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-label">
+          <span class="mono-dim">// 01 - THE PROBLEM</span>
+        </div>
+        <div class="section-content">
+          <p class="body-text">
+            A sidebar width changes. That affects content width. Text wrapping changes.
+            Card heights shift. Scroll positions break. Sticky elements jump.
+            Virtualized ranges flicker.
+          </p>
+          <p class="body-text dim-text">
+            Most apps handle this by recomputing everything.
+            They have no abstraction for <span class="emp">what geometry changed, and what depends on it.</span>
+          </p>
+          <div class="evidence">
+            <div class="evidence-item">
+              <span class="evidence-lib">TanStack Virtual</span>
+              <span class="evidence-issue">#832, #659 - dynamic height jank</span>
+            </div>
+            <div class="evidence-item">
+              <span class="evidence-lib">react-window</span>
+              <span class="evidence-issue">#741 - scroll jitters</span>
+            </div>
+            <div class="evidence-item">
+              <span class="evidence-lib">react-virtuoso</span>
+              <span class="evidence-issue">#1220 - persistent flickering</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="section" id="solution">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-label">
+          <span class="mono-dim">// 02 - THE SOLUTION</span>
+        </div>
+        <div class="section-content">
+          <h2 class="section-title">
+            Declare what depends on what.<br />
+            <span class="dim-text">The engine handles the rest.</span>
+          </h2>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">dashboard.ts</span>
+              <span class="code-lang">typescript</span>
+            </div>
+            <pre><code><span class="syn-kw">import</span> {"{ input, node, why }"} <span class="syn-kw">from</span> <span class="syn-str">'@blu3ph4ntom/inval'</span>
+
+<span class="syn-cm">// Declare inputs - external world feeds these</span>
+<span class="syn-kw">const</span> width = input(<span class="syn-num">800</span>)
+<span class="syn-kw">const</span> height = input(<span class="syn-num">600</span>)
+
+<span class="syn-cm">// Computed nodes - lazy, cached, incremental</span>
+<span class="syn-kw">const</span> area = node({"{"}
+  dependsOn: {"{ w: width, h: height }"},
+  compute: ({"{ w, h }"}) ={"{"}{"}"} w * h
+{"}"})
+
+area.get()    <span class="syn-cm">// 480000 - computes lazily</span>
+area.get()    <span class="syn-cm">// 480000 - cached, zero cost</span>
+
+width.set(<span class="syn-num">1000</span>)
+area.get()    <span class="syn-cm">// 600000 - only recomputes if needed</span>
+
+why(area)     <span class="syn-cm">// ['area', 'width'] - debug invalidations</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-label">
+          <span class="mono-dim">// 03 - FEATURES</span>
+        </div>
+        <div class="section-content">
+          <div class="features-grid">
+            <div class="feature-card">
+              <h3>Explicit graphs</h3>
+              <p>You declare dependencies. No guessing what's stale.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Debug with why()</h3>
+              <p>Trace exactly which nodes invalidated and why.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Zero deps</h3>
+              <p>Pure TypeScript. 12KB packed. No runtime dependencies.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Framework agnostic</h3>
+              <p>React, Vue, Svelte, vanilla JS. IIFE for script tags.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Lazy + cached</h3>
+              <p>Recomputes only if dirty. Cached otherwise. Deterministic.</p>
+            </div>
+            <div class="feature-card">
+              <h3>Battle tested</h3>
+              <p>71 tests. Diamond deps. Deep chains. Edge cases covered.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section class="section" id="use-cases">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-label">
+          <span class="mono-dim">// 04 - USE CASES</span>
+        </div>
+        <div class="section-content">
+          <div class="use-cases">
+            <span class="use-tag">Virtualized lists</span>
+            <span class="use-tag">Resizable panels</span>
+            <span class="use-tag">Dashboards</span>
+            <span class="use-tag">Node editors</span>
+            <span class="use-tag">Kanban boards</span>
+            <span class="use-tag">Data grids</span>
+            <span class="use-tag">Timeline editors</span>
+            <span class="use-tag">Chat UIs</span>
+            <span class="use-tag">Whiteboards</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENCHMARKS -->
+  <section class="section" id="benchmarks">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-label">
+          <span class="mono-dim">// 05 - BENCHMARKS</span>
+        </div>
+        <div class="section-content">
+          <div class="bench-grid">
+            <div class="bench-item">
+              <span class="bench-name">input.get() cached</span>
+              <span class="bench-val">34.6M ops/s</span>
+            </div>
+            <div class="bench-item">
+              <span class="bench-name">computed.get() cached</span>
+              <span class="bench-val">44.3M ops/s</span>
+            </div>
+            <div class="bench-item">
+              <span class="bench-name">input.set() + get() cycle</span>
+              <span class="bench-val">1.9M ops/s</span>
+            </div>
+            <div class="bench-item">
+              <span class="bench-name">chain depth 10: set+get</span>
+              <span class="bench-val">503K ops/s</span>
+            </div>
+            <div class="bench-item">
+              <span class="bench-name">diamond (1 to 4 to 1): set+get</span>
+              <span class="bench-val">1.5M ops/s</span>
+            </div>
+            <div class="bench-item">
+              <span class="bench-name">100 chains: set 1, get 1</span>
+              <span class="bench-val">3.7M ops/s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section class="section" id="install">
+    <div class="container">
+      <div class="section-grid">
+        <div class="section-label">
+          <span class="mono-dim">// 06 - INSTALL</span>
+        </div>
+        <div class="section-content">
+          <div class="code-block">
+            <pre><code>npm install @blu3ph4ntom/inval
+bun add @blu3ph4ntom/inval
+pnpm add @blu3ph4ntom/inval</code></pre>
+          </div>
+          <div class="links">
+            <a href="https://www.npmjs.com/package/@blu3ph4ntom/inval" target="_blank">npm</a>
+            <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="page-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <span class="footer-text">MIT - free for commercial use.</span>
+        <span class="footer-text">@blu3ph4ntom/inval@0.1.1</span>
+      </div>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --fg: #e8e8e8;
+    --fg-dim: #6b6b6b;
+    --fg-muted: #3a3a3a;
+    --accent: #ffffff;
+    --code-bg: #111111;
+    --code-border: #1e1e1e;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --font-serif: 'Instrument Serif', Georgia, serif;
+    --font-mono: 'DM Mono', 'Fira Code', monospace;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 120px 0 100px;
+    border-bottom: 1px solid var(--fg-muted);
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid var(--fg-muted);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--fg-dim);
+    margin-bottom: 48px;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero-title {
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 7vw, 72px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    margin-bottom: 28px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--fg-dim);
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--fg-dim);
+    max-width: 480px;
+    margin-bottom: 64px;
+  }
+
+  .hero-perf {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 420px;
+  }
+
+  .perf-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .perf-label {
+    width: 48px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+  }
+
+  .perf-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--fg-muted);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .perf-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 2px;
+    animation: bar-fill 1.5s ease-out forwards;
+  }
+
+  .naive-fill {
+    width: 10%;
+    background: var(--warning);
+  }
+
+  .inval-fill {
+    width: 100%;
+    background: var(--success);
+  }
+
+  @keyframes bar-fill {
+    from { width: 0; }
+  }
+
+  .perf-val {
+    font-size: 13px;
+    color: var(--fg-dim);
+    min-width: 100px;
+    text-align: right;
+  }
+
+  .accent-val {
+    color: var(--success);
+  }
+
+  /* SECTIONS */
+  .section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--fg-muted);
+  }
+
+  .section-grid {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 48px;
+  }
+
+  .section-label {
+    padding-top: 4px;
+  }
+
+  .mono-dim {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--fg-muted);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 40px;
+  }
+
+  .dim-text {
+    color: var(--fg-dim);
+  }
+
+  .emp {
+    color: var(--fg);
+    font-weight: 400;
+  }
+
+  .body-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--fg-dim);
+    margin-bottom: 20px;
+    max-width: 560px;
+  }
+
+  .body-text .emp {
+    font-style: normal;
+  }
+
+  /* EVIDENCE */
+  .evidence {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .evidence-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+  }
+
+  .evidence-lib {
+    color: var(--fg);
+    min-width: 140px;
+  }
+
+  .evidence-issue {
+    color: var(--fg-muted);
+  }
+
+  /* CODE BLOCK */
+  .code-block {
+    border: 1px solid var(--code-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--code-bg);
+    margin-bottom: 16px;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--code-border);
+    font-size: 11px;
+  }
+
+  .code-filename {
+    color: var(--fg-dim);
+  }
+
+  .code-lang {
+    color: var(--fg-muted);
+  }
+
+  .code-block pre {
+    padding: 20px 24px;
+    overflow-x: auto;
+  }
+
+  .code-block code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--fg);
+  }
+
+  .syn-kw { color: #c9a7ff; }
+  .syn-str { color: #a8d8a8; }
+  .syn-num { color: #e8c97a; }
+  .syn-cm { color: var(--fg-muted); }
+
+  /* FEATURES GRID */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--fg-muted);
+    border: 1px solid var(--fg-muted);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .feature-card {
+    padding: 28px 24px;
+    background: var(--bg);
+  }
+
+  .feature-card h3 {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--fg-dim);
+  }
+
+  /* USE CASES */
+  .use-cases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .use-tag {
+    padding: 8px 16px;
+    border: 1px solid var(--fg-muted);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--fg-dim);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .use-tag:hover {
+    color: var(--fg);
+    border-color: var(--fg-dim);
+  }
+
+  /* BENCHMARKS */
+  .bench-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--fg-muted);
+    border: 1px solid var(--fg-muted);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .bench-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg);
+  }
+
+  .bench-name {
+    font-size: 12px;
+    color: var(--fg-dim);
+  }
+
+  .bench-val {
+    font-size: 13px;
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  /* LINKS */
+  .links {
+    display: flex;
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  .links a {
+    font-size: 13px;
+    color: var(--fg-dim);
+    transition: color 0.2s;
+  }
+
+  .links a:hover {
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  /* FOOTER */
+  .page-footer {
+    padding: 32px 0;
+  }
+
+  .footer-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .section-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bench-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .evidence-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .footer-grid {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero {
+      padding: 80px 0 60px;
+    }
+
+    .section {
+      padding: 60px 0;
+    }
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>
