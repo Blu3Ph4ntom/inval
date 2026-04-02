@@ -49,6 +49,32 @@ bun add @blu3ph4ntom/inval
 pnpm add @blu3ph4ntom/inval
 ```
 
+### Why More Code?
+
+Yes, `const area = node({ dependsOn: { w, h }, compute: ({ w, h }) => w * h })` is more verbose than `const area = width * height`.
+
+**But consider what's missing from the simple version:**
+
+```typescript
+// This is what your simple version is actually doing:
+function getArea() {
+  // Did width or height change since last call?
+  // Do I need to recompute or can I return cached?
+  // What if I forgot a dependency and it's stale?
+  // What if height depends on width indirectly?
+  // How do I debug why it recomputed?
+  return width * height
+}
+```
+
+Inval gives you:
+- **Explicit dependencies** — No more guessing what's cached
+- **Debug tools** — `why(node)` tells you exactly what invalidated
+- **Incremental updates** — Only recompute what changed
+- **Production confidence** — 71 tests, deterministic behavior
+
+**For simple cases** — use plain variables. **When layout gets complex** — Inval scales.
+
 ---
 
 ## The Inval Difference
