@@ -6,8 +6,8 @@ import type {
   InspectInfo,
 } from './types.js'
 import { generateId } from './types.js'
-import { checkForCycles } from './graph.js'
-import { markDirty } from './graph.js'
+import { checkForCycles, markDirty } from './graph.js'
+import { trackInput, isInBatch } from './batch.js'
 
 export function input<T>(value: T): InputNode<T> {
   const self: InputNode<T> = {
@@ -25,6 +25,7 @@ export function input<T>(value: T): InputNode<T> {
       if (Object.is(self._value, newValue)) return
       self._value = newValue
       self._dirty = false
+      if (isInBatch()) trackInput(self)
       markDirty(self)
     },
 

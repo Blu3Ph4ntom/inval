@@ -69,28 +69,26 @@ function collectChildren(
 }
 
 export function why(target: Node): string[] {
+  if (!target._dirty && target.kind === 'computed') return []
+
   const path: string[] = []
   const visited = new Set<Node>()
 
-  function trace(node: Node): boolean {
-    if (visited.has(node)) return false
+  function trace(node: Node): void {
+    if (visited.has(node)) return
     visited.add(node)
 
-    if (node.kind === 'input' && node._dirty) {
-      path.push(node.id)
-      return true
-    }
+    path.push(node.id)
 
     if (node.kind === 'computed') {
       for (const parent of node._parents) {
-        if (trace(parent)) {
-          path.push(node.id)
-          return true
+        if (parent.kind === 'computed' && parent._dirty) {
+          trace(parent)
+        } else if (parent.kind === 'input') {
+          path.push(parent.id)
         }
       }
     }
-
-    return false
   }
 
   trace(target)
