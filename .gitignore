@@ -3,3 +3,5 @@ dist/
 .agent/
 *.tsbuildinfo
 .bun/
+demo/screenshot.ts
+demo/serve.ts

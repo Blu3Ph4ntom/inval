@@ -29,8 +29,6 @@
     "bench": "bun run bench/index.ts",
     "bench:compare": "bun run bench/compare.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "bunx biome check src/ test/",
-    "demo:serve": "bun run demo/serve.ts",
     "prepublishOnly": "bun run typecheck && bun test && bun run build"
   },
   "keywords": [
