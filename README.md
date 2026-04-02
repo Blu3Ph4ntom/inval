@@ -531,6 +531,10 @@ totalColumnHeight.get() // recomputes
 
 ## Performance
 
+[![Dashboard Demo](docs/media/dashboard-width.png)](docs/media/dashboard-demo.webm)
+
+Watch the demo: changing the Width slider causes inval to cache 5 widgets while the naive version recomputes all 6. The Stress Test button shows the performance difference.
+
 ```
 input.get() cached            34,578,147 ops/s
 computed.get() cached         44,267,375 ops/s
