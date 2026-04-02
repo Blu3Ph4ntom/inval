@@ -1,5 +1,4 @@
-import type { BatchFn } from './types.js'
-import type { Node, ComputedNode } from './types.js'
+import type { BatchFn, Node } from './types.js'
 
 let inBatch = false
 const batchedInputs = new Set<Node>()
@@ -40,14 +39,8 @@ function collectDirtied(inputs: Set<Node>): Set<Node> {
     visited.add(node)
     changed.add(node)
 
-    if (node.kind === 'input') {
-      for (const child of node._children) {
-        queue.push(child)
-      }
-    } else {
-      for (const child of node._children) {
-        queue.push(child)
-      }
+    for (const child of node._children) {
+      queue.push(child)
     }
   }
 

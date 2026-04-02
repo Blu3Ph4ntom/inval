@@ -16,6 +16,7 @@ export function input<T>(value: T): InputNode<T> {
     _children: new Set(),
     _value: value,
     _dirty: false,
+    _disposed: false,
 
     get() {
       return self._value
@@ -49,6 +50,14 @@ export function input<T>(value: T): InputNode<T> {
         childCount: self._children.size,
       }
     },
+
+    dispose() {
+      self._disposed = true
+      for (const child of self._children) {
+        child._parents = child._parents.filter(p => p !== self)
+      }
+      self._children.clear()
+    },
   }
 
   return self
@@ -72,6 +81,7 @@ export function node<T>(options: NodeOptions<T>): ComputedNode<T> {
     _value: undefined,
     _dirty: true,
     _computeCount: 0,
+    _disposed: false,
 
     get() {
       if (self._dirty) {
@@ -101,14 +111,22 @@ export function node<T>(options: NodeOptions<T>): ComputedNode<T> {
         childCount: self._children.size,
       }
     },
+
+    dispose() {
+      self._disposed = true
+      for (const parent of self._parents) {
+        parent._children.delete(self)
+      }
+      for (const child of self._children) {
+        child._parents = child._parents.filter(p => p !== self)
+      }
+      self._parents = []
+      self._children.clear()
+    },
   }
 
   for (const parent of depNodes) {
-    if (parent.kind === 'input') {
-      parent._children.add(self)
-    } else {
-      parent._children.add(self)
-    }
+    parent._children.add(self)
   }
 
   return self

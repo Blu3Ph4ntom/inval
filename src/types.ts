@@ -6,9 +6,11 @@ export interface InputNode<T = unknown> {
   invalidate(): void
   isDirty(): boolean
   inspect(): InspectInfo<T>
+  dispose(): void
   _children: Set<ComputedNode>
   _value: T
   _dirty: boolean
+  _disposed: boolean
 }
 
 export interface ComputedNode<T = unknown> {
@@ -18,6 +20,7 @@ export interface ComputedNode<T = unknown> {
   invalidate(): void
   isDirty(): boolean
   inspect(): InspectInfo<T>
+  dispose(): void
   _parents: Node[]
   _children: Set<ComputedNode>
   _compute: (deps: Record<string, unknown>) => T
@@ -26,6 +29,7 @@ export interface ComputedNode<T = unknown> {
   _value: T | undefined
   _dirty: boolean
   _computeCount: number
+  _disposed: boolean
 }
 
 export type Node<T = unknown> = InputNode<T> | ComputedNode<T>
@@ -51,4 +55,8 @@ let nextId = 0
 
 export function generateId(): string {
   return `n${nextId++}`
+}
+
+export function resetIdCounter(): void {
+  nextId = 0
 }

@@ -2,7 +2,7 @@ import type { Node, ComputedNode } from './types.js'
 
 export class InvalCycleError extends Error {
   constructor(path: string[]) {
-    super(`Cycle detected: ${path.join(' → ')}`)
+    super(`Cycle detected: ${path.join(' \u2192 ')}`)
     this.name = 'InvalCycleError'
   }
 }
@@ -34,10 +34,16 @@ export function checkForCycles(roots: Node[]): void {
 }
 
 export function markDirty(source: Node): void {
-  const queue: ComputedNode[] = []
   const visited = new Set<ComputedNode>()
+  const queue: ComputedNode[] = []
 
-  collectChildren(source, queue, visited)
+  for (const child of source._children) {
+    if (!visited.has(child)) {
+      visited.add(child)
+      queue.push(child)
+      collectChildren(child, queue, visited)
+    }
+  }
 
   for (const child of queue) {
     child._dirty = true
@@ -45,31 +51,21 @@ export function markDirty(source: Node): void {
 }
 
 function collectChildren(
-  node: Node,
+  node: ComputedNode,
   queue: ComputedNode[],
   visited: Set<ComputedNode>,
 ): void {
-  if (node.kind === 'input') {
-    for (const child of node._children) {
-      if (!visited.has(child)) {
-        visited.add(child)
-        queue.push(child)
-        collectChildren(child, queue, visited)
-      }
-    }
-  } else {
-    for (const child of node._children) {
-      if (!visited.has(child)) {
-        visited.add(child)
-        queue.push(child)
-        collectChildren(child, queue, visited)
-      }
+  for (const child of node._children) {
+    if (!visited.has(child)) {
+      visited.add(child)
+      queue.push(child)
+      collectChildren(child, queue, visited)
     }
   }
 }
 
 export function why(target: Node): string[] {
-  if (!target._dirty && target.kind === 'computed') return []
+  if (target.kind === 'computed' && !target._dirty) return []
 
   const path: string[] = []
   const visited = new Set<Node>()
@@ -85,7 +81,10 @@ export function why(target: Node): string[] {
         if (parent.kind === 'computed' && parent._dirty) {
           trace(parent)
         } else if (parent.kind === 'input') {
-          path.push(parent.id)
+          if (!visited.has(parent)) {
+            visited.add(parent)
+            path.push(parent.id)
+          }
         }
       }
     }
@@ -95,10 +94,38 @@ export function why(target: Node): string[] {
   return path
 }
 
-export function nodeCount(): number {
-  return parseInt(globalThis.__inval_nodeCount ?? '0', 10)
+export function ancestors(node: Node): Node[] {
+  const result: Node[] = []
+  const visited = new Set<Node>()
+
+  function walk(n: Node): void {
+    if (visited.has(n)) return
+    visited.add(n)
+    result.push(n)
+    if (n.kind === 'computed') {
+      for (const parent of n._parents) {
+        walk(parent)
+      }
+    }
+  }
+
+  walk(node)
+  return result
 }
 
-declare global {
-  var __inval_nodeCount: string | undefined
+export function descendants(node: Node): Node[] {
+  const result: Node[] = []
+  const visited = new Set<Node>()
+
+  function walk(n: Node): void {
+    if (visited.has(n)) return
+    visited.add(n)
+    result.push(n)
+    for (const child of n._children) {
+      walk(child)
+    }
+  }
+
+  walk(node)
+  return result
 }
