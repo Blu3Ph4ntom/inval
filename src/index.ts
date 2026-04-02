@@ -1,6 +1,6 @@
 export { input, node } from './node.js'
 export { batch } from './batch.js'
-export { why, ancestors, descendants, checkForCycles, InvalCycleError } from './graph.js'
+export { why, ancestors, descendants, graphSize, checkForCycles, InvalCycleError } from './graph.js'
 export { toDot, stats } from './debug.js'
 export { resetIdCounter } from './types.js'
 export type {

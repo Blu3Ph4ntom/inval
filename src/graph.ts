@@ -41,26 +41,22 @@ export function markDirty(source: Node): void {
     if (!visited.has(child)) {
       visited.add(child)
       queue.push(child)
-      collectChildren(child, queue, visited)
+    }
+  }
+
+  let i = 0
+  while (i < queue.length) {
+    const node = queue[i++]!
+    for (const child of node._children) {
+      if (!visited.has(child)) {
+        visited.add(child)
+        queue.push(child)
+      }
     }
   }
 
   for (const child of queue) {
     child._dirty = true
-  }
-}
-
-function collectChildren(
-  node: ComputedNode,
-  queue: ComputedNode[],
-  visited: Set<ComputedNode>,
-): void {
-  for (const child of node._children) {
-    if (!visited.has(child)) {
-      visited.add(child)
-      queue.push(child)
-      collectChildren(child, queue, visited)
-    }
   }
 }
 
@@ -73,18 +69,15 @@ export function why(target: Node): string[] {
   function trace(node: Node): void {
     if (visited.has(node)) return
     visited.add(node)
-
     path.push(node.id)
 
     if (node.kind === 'computed') {
       for (const parent of node._parents) {
         if (parent.kind === 'computed' && parent._dirty) {
           trace(parent)
-        } else if (parent.kind === 'input') {
-          if (!visited.has(parent)) {
-            visited.add(parent)
-            path.push(parent.id)
-          }
+        } else if (parent.kind === 'input' && !visited.has(parent)) {
+          visited.add(parent)
+          path.push(parent.id)
         }
       }
     }
@@ -128,4 +121,8 @@ export function descendants(node: Node): Node[] {
 
   walk(node)
   return result
+}
+
+export function graphSize(root: Node): number {
+  return ancestors(root).length
 }

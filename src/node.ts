@@ -25,25 +25,24 @@ export function input<T>(value: T): InputNode<T> {
     set(newValue: T) {
       if (Object.is(self._value, newValue)) return
       self._value = newValue
-      self._dirty = false
       if (isInBatch()) trackInput(self)
       markDirty(self)
     },
 
     invalidate() {
-      self._dirty = false
+      if (isInBatch()) trackInput(self)
       markDirty(self)
     },
 
     isDirty() {
-      return self._dirty
+      return false
     },
 
     inspect(): InspectInfo<T> {
       return {
         id: self.id,
         kind: 'input',
-        dirty: self._dirty,
+        dirty: false,
         lastValue: self._value,
         computeCount: 0,
         depCount: 0,
