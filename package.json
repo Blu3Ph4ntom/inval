@@ -1,5 +1,5 @@
 {
-  "name": "inval",
+  "name": "@blu3ph4ntom/inval",
   "version": "0.1.0",
   "description": "Deterministic, incremental layout invalidation engine",
   "type": "module",
