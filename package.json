@@ -23,7 +23,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --format esm --target node && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && bun build src/index.ts --outdir dist --format iife --global-name inval --target browser && bun run build:types",
+    "build": "bun run scripts/build.ts",
     "build:types": "tsc --emitDeclarationOnly --outDir dist",
     "test": "bun test",
     "bench": "bun run bench/index.ts",
