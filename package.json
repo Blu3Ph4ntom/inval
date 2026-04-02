@@ -47,14 +47,13 @@
   "license": "MIT",
   "devDependencies": {
     "esbuild": "^0.25.11",
-    "playwright": "^1.59.1",
     "typescript": "^5.7.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/blu3ph4ntom/inval.git"
+    "url": "git+https://github.com/Blu3ph4ntom/inval.git"
   },
-  "homepage": "https://github.com/blu3ph4ntom/inval#readme",
+  "homepage": "https://github.com/Blu3ph4ntom/inval#readme",
   "bugs": {
     "url": "https://github.com/blu3ph4ntom/inval/issues"
   },

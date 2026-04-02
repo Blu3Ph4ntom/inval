@@ -7,8 +7,6 @@ Not a framework. Not a renderer. The missing primitive for layout-aware applicat
 ```
 naive:  50 widgets, change 1 width     417K ops/s
 inval:  50 widgets, change 1 width   4,230K ops/s  (10x faster)
-
-![Dashboard Demo](docs/dashboard-demo.gif)
 ```
 
 ---
@@ -428,6 +426,20 @@ bun install
 # Open in browser
 open demo/pure/index.html           # With inval
 open demo/without-inval/index.html  # Without inval (naive)
+```
+
+### Live Demo
+
+A side-by-side dashboard demo showing the difference between using Inval vs naive approach:
+
+- **demo/pure/index.html** — Uses Inval for incremental updates
+- **demo/without-inval/index.html** — Recomputes everything on each change
+
+Watch the video:
+```bash
+# The webm video is available at docs/dashboard-demo.webm
+# Open in browser or convert to view locally
+open docs/dashboard-demo.webm
 ```
 
 ---
