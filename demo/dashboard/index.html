@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>inval Dashboard Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      background: #09090b;
+      color: #e4e4e7;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .app { display: flex; height: 100vh; }
+
+    /* Left: With inval */
+    .panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #27272a; }
+    .panel:last-child { border-right: none; }
+    .panel-header {
+      padding: 12px 16px;
+      background: #18181b;
+      border-bottom: 1px solid #27272a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-header h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .panel-header .badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .badge-good { background: #064e3b; color: #6ee7b7; }
+    .badge-bad { background: #7f1d1d; color: #fca5a5; }
+
+    .dashboard {
+      flex: 1;
+      padding: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .widget {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .widget-title {
+      font-size: 10px;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .widget-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fafafa;
+    }
+    .widget-sub { font-size: 10px; color: #52525b; margin-top: 4px; }
+
+    .widget.flash { animation: flash 0.3s ease; }
+    @keyframes flash {
+      0% { background: #27272a; }
+      100% { background: #18181b; }
+    }
+
+    .stats-bar {
+      padding: 8px 12px;
+      background: #18181b;
+      border-top: 1px solid #27272a;
+      font-size: 10px;
+      color: #71717a;
+      display: flex;
+      gap: 16px;
+    }
+    .stat-label { color: #52525b; }
+    .stat-recomputed { color: #f59e0b; }
+    .stat-cached { color: #22c55e; }
+
+    /* Controls */
+    .controls {
+      padding: 12px 16px;
+      background: #18181b;
+      border-bottom: 1px solid #27272a;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .controls label { font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 1px; }
+    .controls input[type="range"] { width: 200px; accent-color: #a78bfa; }
+    .controls .val { font-size: 12px; color: #fafafa; min-width: 50px; }
+    .controls button {
+      background: #a78bfa;
+      color: #09090b;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .controls button:hover { background: #c4b5fd; }
+
+    .chart-bar {
+      width: 100%;
+      height: 40px;
+      margin-top: 8px;
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .chart-bar div {
+      flex: 1;
+      background: #a78bfa;
+      border-radius: 2px 2px 0 0;
+      min-height: 4px;
+      transition: height 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <label>Width</label>
+    <input type="range" id="width" min="200" max="1600" value="1200">
+    <span class="val" id="width-val">1200</span>
+    <label>Zoom</label>
+    <input type="range" id="zoom" min="50" max="200" value="100">
+    <span class="val" id="zoom-val">100%</span>
+    <label>Data</label>
+    <input type="range" id="data" min="0" max="100" value="50">
+    <span class="val" id="data-val">50</span>
+    <button id="stress">Stress Test (100 changes)</button>
+  </div>
+  <div class="app">
+    <!-- Left: With inval -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>With inval</h2>
+        <span class="badge badge-good">Incremental</span>
+      </div>
+      <div class="dashboard" id="inval-dashboard"></div>
+      <div class="stats-bar" id="inval-stats"></div>
+    </div>
+    <!-- Right: Without inval (naive) -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Without inval</h2>
+        <span class="badge badge-bad">Naive</span>
+      </div>
+      <div class="dashboard" id="naive-dashboard"></div>
+      <div class="stats-bar" id="naive-stats"></div>
+    </div>
+  </div>
+
+  <script src="../dist/inval.iife.js"></script>
+  <script>
+    const { input, node, batch, why } = inval
+
+    // ── Shared data ──
+    const widgetConfigs = [
+      { id: 'chart', title: 'Revenue Chart', compute: (w, z, d) => `$${(w * z * d * 12.5).toLocaleString()}`, bars: 12 },
+      { id: 'table', title: 'Active Users', compute: (w, z, d) => Math.floor(w * z * 0.8 + d * 100).toLocaleString(), bars: 8 },
+      { id: 'map', title: 'Conversion Rate', compute: (w, z, d) => `${(d * z * 0.015).toFixed(1)}%`, bars: 6 },
+      { id: 'list', title: 'Orders Today', compute: (w, z, d) => Math.floor(d * z * 3.2).toLocaleString(), bars: 10 },
+      { id: 'metrics', title: 'Avg Session', compute: (w, z, d) => `${(d * 0.5 + z * 2).toFixed(0)}m ${Math.floor(w * 0.01)}s`, bars: 0 },
+      { id: 'status', title: 'Server Load', compute: (w, z, d) => `${(w * 0.001 + d * 0.02).toFixed(1)}%`, bars: 4 },
+    ]
+
+    // ── inval version ──
+    const invalWidth = input(1200)
+    const invalZoom = input(1)
+    const invalData = input(50)
+
+    const invalWidgets = widgetConfigs.map(cfg => {
+      const width = node({
+        dependsOn: { w: invalWidth },
+        compute: ({ w }) => Math.floor((w as number) / 3)
+      })
+      const value = node({
+        dependsOn: { w: invalWidth, z: invalZoom, d: invalData },
+        compute: ({ w, z, d }) => cfg.compute(w as number, z as number, d as number)
+      })
+      const bars = cfg.bars > 0 ? node({
+        dependsOn: { z: invalZoom, d: invalData },
+        compute: ({ z, d }) => {
+          const arr = []
+          for (let i = 0; i < cfg.bars; i++) {
+            arr.push(Math.random() * (z as number) * (d as number) * 0.5)
+          }
+          return arr
+        }
+      }) : null
+      return { cfg, width, value, bars, computeCount: 0 }
+    })
+
+    // Initial compute
+    invalWidgets.forEach(w => {
+      w.value.get()
+      if (w.bars) w.bars.get()
+    })
+
+    function renderInval() {
+      const dashboard = document.getElementById('inval-dashboard')
+      const stats = document.getElementById('inval-stats')
+      let recomputed = 0
+      let cached = 0
+
+      dashboard.innerHTML = invalWidgets.map(w => {
+        const val = w.value.get()
+        const vInfo = w.value.inspect()
+        if (vInfo.computeCount > w.computeCount) {
+          recomputed++
+          w.computeCount = vInfo.computeCount
+        } else {
+          cached++
+        }
+        const bars = w.bars ? w.bars.get() : null
+        const bInfo = w.bars ? w.bars.inspect() : null
+        if (bInfo && bInfo.computeCount > w.computeCount) {
+          // already counted
+        }
+        const barHtml = bars ? `<div class="chart-bar">${bars.map(h => `<div style="height:${Math.max(4, h)}px"></div>`).join('')}</div>` : ''
+        return `
+          <div class="widget" id="inval-${w.cfg.id}">
+            <div class="widget-title">${w.cfg.title}</div>
+            <div class="widget-value">${val}</div>
+            <div class="widget-sub">compute: ${vInfo.computeCount}x</div>
+            ${barHtml}
+          </div>
+        `
+      }).join('')
+
+      stats.innerHTML = `
+        <span><span class="stat-label">Recomputed:</span> <span class="stat-recomputed">${recomputed}</span></span>
+        <span><span class="stat-label">Cached:</span> <span class="stat-cached">${cached}</span></span>
+        <span><span class="stat-label">Total computes:</span> ${invalWidgets.reduce((a, w) => a + w.value.inspect().computeCount, 0)}</span>
+      `
+    }
+
+    // ── Naive version ──
+    let naiveWidth = 1200
+    let naiveZoom = 1
+    let naiveData = 50
+    let naiveComputeCount = {}
+    widgetConfigs.forEach(cfg => { naiveComputeCount[cfg.id] = 0 })
+
+    function computeNaiveWidget(cfg) {
+      naiveComputeCount[cfg.id]++
+      const val = cfg.compute(naiveWidth, naiveZoom, naiveData)
+      const bars = []
+      for (let i = 0; i < cfg.bars; i++) {
+        bars.push(Math.random() * naiveZoom * naiveData * 0.5)
+      }
+      return { val, bars }
+    }
+
+    function renderNaive() {
+      const dashboard = document.getElementById('naive-dashboard')
+      const stats = document.getElementById('naive-stats')
+      let recomputed = 0
+
+      dashboard.innerHTML = widgetConfigs.map(cfg => {
+        const { val, bars } = computeNaiveWidget(cfg)
+        recomputed++
+        const barHtml = bars.length > 0 ? `<div class="chart-bar">${bars.map(h => `<div style="height:${Math.max(4, h)}px"></div>`).join('')}</div>` : ''
+        return `
+          <div class="widget" id="naive-${cfg.id}">
+            <div class="widget-title">${cfg.title}</div>
+            <div class="widget-value">${val}</div>
+            <div class="widget-sub">compute: ${naiveComputeCount[cfg.id]}x</div>
+            ${barHtml}
+          </div>
+        `
+      }).join('')
+
+      stats.innerHTML = `
+        <span><span class="stat-label">Recomputed:</span> <span class="stat-recomputed">${recomputed}</span></span>
+        <span><span class="stat-label">Cached:</span> <span class="stat-cached">0</span></span>
+        <span><span class="stat-label">Total computes:</span> ${Object.values(naiveComputeCount).reduce((a, b) => a + b, 0)}</span>
+      `
+    }
+
+    // ── Event handlers ──
+    const widthSlider = document.getElementById('width')
+    const zoomSlider = document.getElementById('zoom')
+    const dataSlider = document.getElementById('data')
+    const stressBtn = document.getElementById('stress')
+
+    widthSlider.addEventListener('input', e => {
+      const w = parseInt(e.target.value)
+      document.getElementById('width-val').textContent = w
+      invalWidth.set(w)
+      naiveWidth = w
+      renderInval()
+      renderNaive()
+    })
+
+    zoomSlider.addEventListener('input', e => {
+      const z = parseInt(e.target.value)
+      document.getElementById('zoom-val').textContent = z + '%'
+      invalZoom.set(z / 100)
+      naiveZoom = z / 100
+      renderInval()
+      renderNaive()
+    })
+
+    dataSlider.addEventListener('input', e => {
+      const d = parseInt(e.target.value)
+      document.getElementById('data-val').textContent = d
+      invalData.set(d)
+      naiveData = d
+      renderInval()
+      renderNaive()
+    })
+
+    stressBtn.addEventListener('click', () => {
+      const start = performance.now()
+      for (let i = 0; i < 100; i++) {
+        invalWidth.set(200 + Math.random() * 1400)
+      }
+      const invalTime = performance.now() - start
+
+      const start2 = performance.now()
+      for (let i = 0; i < 100; i++) {
+        naiveWidth = 200 + Math.random() * 1400
+        renderNaive()
+      }
+      const naiveTime = performance.now() - start2
+
+      renderInval()
+      renderNaive()
+
+      alert(`Stress test (100 width changes):\n\nWith inval: ${invalTime.toFixed(1)}ms\nWithout inval: ${naiveTime.toFixed(1)}ms\n\nSpeedup: ${(naiveTime / invalTime).toFixed(1)}x`)
+    })
+
+    // ── Initial render ──
+    renderInval()
+    renderNaive()
+  </script>
+</body>
+</html>

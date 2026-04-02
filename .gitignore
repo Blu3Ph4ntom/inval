@@ -5,3 +5,7 @@ dist/
 .bun/
 demo/screenshot.ts
 demo/serve.ts
+.opencode/
+specs/
+seed.spec.ts
+opencode.json
