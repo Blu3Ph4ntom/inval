@@ -1,0 +1,40 @@
+{
+  "name": "inval",
+  "version": "0.1.0",
+  "description": "Deterministic, incremental layout invalidation engine",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --format esm,cjs --target node && bun run build:types",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "test": "bun test",
+    "bench": "bun run bench/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "bunx biome check src/ test/",
+    "demo:pure": "bun run demo/pure/index.ts"
+  },
+  "keywords": [
+    "layout",
+    "invalidation",
+    "dependency-graph",
+    "reactive",
+    "virtualization",
+    "deterministic"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
