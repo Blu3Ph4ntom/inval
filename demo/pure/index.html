@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>inval — Variable-Height Virtualized List</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 320px;
+      background: #111;
+      border-right: 1px solid #222;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .sidebar h2 {
+      font-size: 14px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .control {
+      margin-bottom: 16px;
+    }
+    .control label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .control input[type="range"] {
+      width: 100%;
+      accent-color: #fff;
+    }
+    .control .value {
+      font-size: 14px;
+      font-family: monospace;
+      color: #fff;
+      margin-top: 2px;
+    }
+    .stats {
+      background: #1a1a1a;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 16px;
+    }
+    .stats .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+    .stats .label { color: #666; }
+    .stats .val { color: #fff; }
+    .stats .dirty { color: #f59e0b; }
+    .stats .clean { color: #22c55e; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #222;
+      background: #111;
+    }
+    .header h1 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .header p {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .viewport {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+    }
+    .list-item {
+      position: absolute;
+      left: 0;
+      right: 0;
+      padding: 16px 20px;
+      border-bottom: 1px solid #1a1a1a;
+      overflow: hidden;
+    }
+    .list-item .title {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .list-item .body {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+    }
+    .list-item .meta {
+      font-size: 11px;
+      color: #444;
+      margin-top: 8px;
+      font-family: monospace;
+    }
+    .graph-viz {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 11px;
+      max-width: 400px;
+    }
+    .graph-viz h3 {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .graph-node {
+      padding: 4px 8px;
+      margin: 2px 0;
+      border-radius: 3px;
+      transition: background 0.15s;
+    }
+    .graph-node.input { background: #1a1a2e; }
+    .graph-node.computed { background: #1a2e1a; }
+    .graph-node.dirty { background: #2e1a1a; color: #f59e0b; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Controls</h2>
+    <div class="control">
+      <label>Viewport Width</label>
+      <input type="range" id="width" min="200" max="1200" value="800">
+      <div class="value" id="width-val">800px</div>
+    </div>
+    <div class="control">
+      <label>Font Size</label>
+      <input type="range" id="fontsize" min="12" max="24" value="15">
+      <div class="value" id="fontsize-val">15px</div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="main">
+    <div class="header">
+      <h1>inval — Virtualized List Demo</h1>
+      <p>Resize the viewport width. Watch how only affected rows recompute.</p>
+    </div>
+    <div class="viewport" id="viewport"></div>
+  </div>
+  <div class="graph-viz" id="graph"></div>
+
+  <script src="../dist/inval.iife.js"></script>
+  <script>
+    const { input, node, batch, stats, why, toDot } = inval
+
+    // ── Generate items ──
+    const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+    const items = Array.from({ length: 500 }, (_, i) => ({
+      id: i,
+      title: `Item ${i + 1} — ${['Feature', 'Bug', 'Task', 'Story', 'Epic'][i % 5]}`,
+      body: lorem.slice(0, 50 + (i % 15) * 30),
+      imageAspect: [0.75, 1.0, 1.33, 1.5][i % 4],
+      priority: ['low', 'medium', 'high', 'critical'][i % 4],
+    }))
+
+    // ── Layout graph ──
+    const viewportWidth = input(800)
+    const fontSize = input(15)
+    const scrollTop = input(0)
+    const viewportHeight = input(window.innerHeight - 60)
+    const itemsInput = input(items)
+
+    const rowHeights = node({
+      dependsOn: { width: viewportWidth, font: fontSize, items: itemsInput },
+      compute: ({ width, font, items }) => {
+        const charWidth = (font as number) * 0.6
+        const charsPerLine = Math.floor((width as number) / charWidth)
+        return (items as typeof items).map(item => {
+          const bodyLines = Math.ceil(item.body.length / charsPerLine)
+          return 24 + bodyLines * ((font as number) * 1.5) + 8 + 16 + 16
+        })
+      },
+    })
+
+    const totalHeight = node({
+      dependsOn: { heights: rowHeights },
+      compute: ({ heights }) => (heights as number[]).reduce((a, b) => a + b, 0),
+    })
+
+    const rowOffsets = node({
+      dependsOn: { heights: rowHeights },
+      compute: ({ heights }) => {
+        const h = heights as number[]
+        const offsets = [0]
+        for (let i = 0; i < h.length; i++) {
+          offsets.push(offsets[i] + h[i])
+        }
+        return offsets
+      },
+    })
+
+    const visibleRange = node({
+      dependsOn: { offsets: rowOffsets, scroll: scrollTop, viewport: viewportHeight },
+      compute: ({ offsets, scroll, viewport }) => {
+        const o = offsets as number[]
+        const s = scroll as number
+        const v = viewport as number
+        let start = 0
+        for (let i = 0; i < o.length; i++) {
+          if (o[i] >= s) { start = Math.max(0, i - 1); break }
+        }
+        let end = o.length - 1
+        for (let i = start; i < o.length; i++) {
+          if (o[i] > s + v) { end = i; break }
+        }
+        return { start, end }
+      },
+    })
+
+    // ── Render ──
+    const viewportEl = document.getElementById('viewport')
+    const statsEl = document.getElementById('stats')
+    const graphEl = document.getElementById('graph')
+    let lastCompute = { rowHeights: 0, totalHeight: 0, visibleRange: 0 }
+
+    function render() {
+      const { start, end } = visibleRange.get()
+      const heights = rowHeights.get()
+      const offsets = rowOffsets.get()
+      const total = totalHeight.get()
+
+      viewportEl.style.height = total + 'px'
+
+      // Only render visible items
+      const fragment = document.createDocumentFragment()
+      for (let i = start; i <= Math.min(end, items.length - 1); i++) {
+        const div = document.createElement('div')
+        div.className = 'list-item'
+        div.style.top = offsets[i] + 'px'
+        div.style.height = heights[i] + 'px'
+        div.innerHTML = `
+          <div class="title">${items[i].title}</div>
+          <div class="body">${items[i].body}</div>
+          <div class="meta">row ${i} · h:${Math.round(heights[i])}px · priority:${items[i].priority}</div>
+        `
+        fragment.appendChild(div)
+      }
+
+      // Clear and append
+      while (viewportEl.firstChild) viewportEl.removeChild(viewportEl.firstChild)
+      viewportEl.appendChild(fragment)
+
+      updateStats()
+    }
+
+    function updateStats() {
+      const rh = rowHeights.inspect()
+      const th = totalHeight.inspect()
+      const vr = visibleRange.inspect()
+      const rr = rowOffsets.inspect()
+      const { start, end } = visibleRange.get()
+
+      const delta = {
+        rowHeights: rh.computeCount - lastCompute.rowHeights,
+        totalHeight: th.computeCount - lastCompute.totalHeight,
+        visibleRange: vr.computeCount - lastCompute.visibleRange,
+      }
+      lastCompute = { rowHeights: rh.computeCount, totalHeight: th.computeCount, visibleRange: vr.computeCount }
+
+      statsEl.innerHTML = `
+        <div class="row"><span class="label">viewportWidth</span><span class="val">${viewportWidth.get()}px</span></div>
+        <div class="row"><span class="label">fontSize</span><span class="val">${fontSize.get()}px</span></div>
+        <div class="row"><span class="label">scrollTop</span><span class="val">${scrollTop.get()}px</span></div>
+        <div class="row"><span class="label">visibleRange</span><span class="val">${start}-${end} (${end - start + 1} items)</span></div>
+        <div class="row"><span class="label">totalHeight</span><span class="val">${Math.round(totalHeight.get())}px</span></div>
+        <div style="height:8px"></div>
+        <div class="row"><span class="label">rowHeights</span><span class="${delta.rowHeights ? 'dirty' : 'clean'}">${delta.rowHeights ? 'RECOMPUTED' : 'cached'} (${rh.computeCount}x)</span></div>
+        <div class="row"><span class="label">rowOffsets</span><span class="${delta.rowHeights ? 'dirty' : 'clean'}">${delta.rowHeights ? 'RECOMPUTED' : 'cached'} (${rr.computeCount}x)</span></div>
+        <div class="row"><span class="label">totalHeight</span><span class="${delta.totalHeight ? 'dirty' : 'clean'}">${delta.totalHeight ? 'RECOMPUTED' : 'cached'} (${th.computeCount}x)</span></div>
+        <div class="row"><span class="label">visibleRange</span><span class="${delta.visibleRange ? 'dirty' : 'clean'}">${delta.visibleRange ? 'RECOMPUTED' : 'cached'} (${vr.computeCount}x)</span></div>
+      `
+    }
+
+    function updateGraph() {
+      const nodes = [
+        { id: viewportWidth.id, label: 'viewportWidth', kind: 'input' },
+        { id: fontSize.id, label: 'fontSize', kind: 'input' },
+        { id: scrollTop.id, label: 'scrollTop', kind: 'input' },
+        { id: viewportHeight.id, label: 'viewportHeight', kind: 'input' },
+        { id: itemsInput.id, label: 'items', kind: 'input' },
+        { id: rowHeights.id, label: 'rowHeights', kind: 'computed', dirty: rowHeights.isDirty() },
+        { id: rowOffsets.id, label: 'rowOffsets', kind: 'computed', dirty: rowOffsets.isDirty() },
+        { id: totalHeight.id, label: 'totalHeight', kind: 'computed', dirty: totalHeight.isDirty() },
+        { id: visibleRange.id, label: 'visibleRange', kind: 'computed', dirty: visibleRange.isDirty() },
+      ]
+
+      graphEl.innerHTML = `
+        <h3>Dependency Graph</h3>
+        ${nodes.map(n =>
+          `<div class="graph-node ${n.kind} ${n.dirty ? 'dirty' : ''}">${n.label} [${n.kind}]${n.dirty ? ' ●' : ''}</div>`
+        ).join('')}
+      `
+    }
+
+    // ── Event handlers ──
+    const widthSlider = document.getElementById('width')
+    const fontsizeSlider = document.getElementById('fontsize')
+    const widthVal = document.getElementById('width-val')
+    const fontsizeVal = document.getElementById('fontsize-val')
+
+    widthSlider.addEventListener('input', e => {
+      const w = parseInt(e.target.value)
+      viewportWidth.set(w)
+      widthVal.textContent = w + 'px'
+      render()
+      updateGraph()
+    })
+
+    fontsizeSlider.addEventListener('input', e => {
+      const f = parseInt(e.target.value)
+      fontSize.set(f)
+      fontsizeVal.textContent = f + 'px'
+      render()
+      updateGraph()
+    })
+
+    viewportEl.parentElement.addEventListener('scroll', e => {
+      scrollTop.set(e.target.scrollTop)
+      render()
+      updateGraph()
+    })
+
+    window.addEventListener('resize', () => {
+      viewportHeight.set(window.innerHeight - 60)
+      render()
+      updateGraph()
+    })
+
+    // ── Initial render ──
+    render()
+    updateGraph()
+  </script>
+</body>
+</html>

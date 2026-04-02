@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Without inval — Naive Approach</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 320px;
+      background: #111;
+      border-right: 1px solid #222;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .sidebar h2 {
+      font-size: 14px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .control {
+      margin-bottom: 16px;
+    }
+    .control label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .control input[type="range"] {
+      width: 100%;
+      accent-color: #fff;
+    }
+    .control .value {
+      font-size: 14px;
+      font-family: monospace;
+      color: #fff;
+      margin-top: 2px;
+    }
+    .stats {
+      background: #1a1a1a;
+      border: 1px solid #222;
+      border-radius: 4px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 16px;
+    }
+    .stats .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+    .stats .label { color: #666; }
+    .stats .val { color: #fff; }
+    .stats .dirty { color: #f59e0b; }
+    .stats .clean { color: #22c55e; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #222;
+      background: #111;
+    }
+    .header h1 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .header p {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .viewport {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+    }
+    .list-item {
+      position: absolute;
+      left: 0;
+      right: 0;
+      padding: 16px 20px;
+      border-bottom: 1px solid #1a1a1a;
+      overflow: hidden;
+    }
+    .list-item .title {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .list-item .body {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+    }
+    .list-item .meta {
+      font-size: 11px;
+      color: #444;
+      margin-top: 8px;
+      font-family: monospace;
+    }
+    .warning {
+      background: #2e1a1a;
+      border: 1px solid #f59e0b;
+      border-radius: 4px;
+      padding: 12px;
+      margin-top: 16px;
+      font-size: 12px;
+      color: #f59e0b;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Controls</h2>
+    <div class="control">
+      <label>Viewport Width</label>
+      <input type="range" id="width" min="200" max="1200" value="800">
+      <div class="value" id="width-val">800px</div>
+    </div>
+    <div class="control">
+      <label>Font Size</label>
+      <input type="range" id="fontsize" min="12" max="24" value="15">
+      <div class="value" id="fontsize-val">15px</div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="warning">
+      Without inval: EVERY change recomputes ALL rows, offsets, total height, and visible range. No dependency tracking. No incremental recomputation.
+    </div>
+  </div>
+  <div class="main">
+    <div class="header">
+      <h1>Without inval — Naive Approach</h1>
+      <p>Every change recomputes everything. Compare with the inval version.</p>
+    </div>
+    <div class="viewport" id="viewport"></div>
+  </div>
+
+  <script>
+    // ── No dependency graph. No incremental recomputation. ──
+    // Every change calls renderEverything().
+
+    const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+    const items = Array.from({ length: 500 }, (_, i) => ({
+      id: i,
+      title: `Item ${i + 1} — ${['Feature', 'Bug', 'Task', 'Story', 'Epic'][i % 5]}`,
+      body: lorem.slice(0, 50 + (i % 15) * 30),
+      imageAspect: [0.75, 1.0, 1.33, 1.5][i % 4],
+      priority: ['low', 'medium', 'high', 'critical'][i % 4],
+    }))
+
+    let state = {
+      viewportWidth: 800,
+      fontSize: 15,
+      scrollTop: 0,
+      viewportHeight: window.innerHeight - 60,
+    }
+
+    let computeCount = { rows: 0, offsets: 0, total: 0, range: 0 }
+    let lastCompute = { rows: 0, offsets: 0, total: 0, range: 0 }
+
+    function measureRows(width, fontSize) {
+      computeCount.rows++
+      const charWidth = fontSize * 0.6
+      const charsPerLine = Math.floor(width / charWidth)
+      return items.map(item => {
+        const bodyLines = Math.ceil(item.body.length / charsPerLine)
+        return 24 + bodyLines * (fontSize * 1.5) + 8 + 16 + 16
+      })
+    }
+
+    function computeOffsets(heights) {
+      computeCount.offsets++
+      const offsets = [0]
+      for (let i = 0; i < heights.length; i++) {
+        offsets.push(offsets[i] + heights[i])
+      }
+      return offsets
+    }
+
+    function computeTotal(heights) {
+      computeCount.total++
+      return heights.reduce((a, b) => a + b, 0)
+    }
+
+    function computeRange(offsets, scrollTop, viewportHeight) {
+      computeCount.range++
+      let start = 0
+      for (let i = 0; i < offsets.length; i++) {
+        if (offsets[i] >= scrollTop) { start = Math.max(0, i - 1); break }
+      }
+      let end = offsets.length - 1
+      for (let i = start; i < offsets.length; i++) {
+        if (offsets[i] > scrollTop + viewportHeight) { end = i; break }
+      }
+      return { start, end }
+    }
+
+    const viewportEl = document.getElementById('viewport')
+    const statsEl = document.getElementById('stats')
+
+    function renderEverything() {
+      // EVERYTHING recomputes on every change
+      const heights = measureRows(state.viewportWidth, state.fontSize)
+      const offsets = computeOffsets(heights)
+      const total = computeTotal(heights)
+      const { start, end } = computeRange(offsets, state.scrollTop, state.viewportHeight)
+
+      viewportEl.style.height = total + 'px'
+
+      const fragment = document.createDocumentFragment()
+      for (let i = start; i <= Math.min(end, items.length - 1); i++) {
+        const div = document.createElement('div')
+        div.className = 'list-item'
+        div.style.top = offsets[i] + 'px'
+        div.style.height = heights[i] + 'px'
+        div.innerHTML = `
+          <div class="title">${items[i].title}</div>
+          <div class="body">${items[i].body}</div>
+          <div class="meta">row ${i} · h:${Math.round(heights[i])}px · priority:${items[i].priority}</div>
+        `
+        fragment.appendChild(div)
+      }
+
+      while (viewportEl.firstChild) viewportEl.removeChild(viewportEl.firstChild)
+      viewportEl.appendChild(fragment)
+
+      updateStats()
+    }
+
+    function updateStats() {
+      const delta = {
+        rows: computeCount.rows - lastCompute.rows,
+        offsets: computeCount.offsets - lastCompute.offsets,
+        total: computeCount.total - lastCompute.total,
+        range: computeCount.range - lastCompute.range,
+      }
+      lastCompute = { ...computeCount }
+
+      statsEl.innerHTML = `
+        <div class="row"><span class="label">viewportWidth</span><span class="val">${state.viewportWidth}px</span></div>
+        <div class="row"><span class="label">fontSize</span><span class="val">${state.fontSize}px</span></div>
+        <div class="row"><span class="label">scrollTop</span><span class="val">${state.scrollTop}px</span></div>
+        <div class="row"><span class="label">rowHeights</span><span class="${delta.rows ? 'dirty' : 'clean'}">${delta.rows ? 'RECOMPUTED' : 'cached'} (${computeCount.rows}x)</span></div>
+        <div class="row"><span class="label">rowOffsets</span><span class="${delta.offsets ? 'dirty' : 'clean'}">${delta.offsets ? 'RECOMPUTED' : 'cached'} (${computeCount.offsets}x)</span></div>
+        <div class="row"><span class="label">totalHeight</span><span class="${delta.total ? 'dirty' : 'clean'}">${delta.total ? 'RECOMPUTED' : 'cached'} (${computeCount.total}x)</span></div>
+        <div class="row"><span class="label">visibleRange</span><span class="${delta.range ? 'dirty' : 'clean'}">${delta.range ? 'RECOMPUTED' : 'cached'} (${computeCount.range}x)</span></div>
+      `
+    }
+
+    // ── Event handlers ──
+    const widthSlider = document.getElementById('width')
+    const fontsizeSlider = document.getElementById('fontsize')
+    const widthVal = document.getElementById('width-val')
+    const fontsizeVal = document.getElementById('fontsize-val')
+
+    widthSlider.addEventListener('input', e => {
+      state.viewportWidth = parseInt(e.target.value)
+      widthVal.textContent = state.viewportWidth + 'px'
+      renderEverything()
+    })
+
+    fontsizeSlider.addEventListener('input', e => {
+      state.fontSize = parseInt(e.target.value)
+      fontsizeVal.textContent = state.fontSize + 'px'
+      renderEverything()
+    })
+
+    viewportEl.parentElement.addEventListener('scroll', e => {
+      state.scrollTop = e.target.scrollTop
+      renderEverything()
+    })
+
+    window.addEventListener('resize', () => {
+      state.viewportHeight = window.innerHeight - 60
+      renderEverything()
+    })
+
+    renderEverything()
+  </script>
+</body>
+</html>
