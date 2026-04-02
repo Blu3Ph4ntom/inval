@@ -1,6 +1,6 @@
 # @blu3ph4ntom/inval
 
-**Deterministic, incremental layout invalidation engine for production.**
+**Deterministic, incremental layout invalidation engine.**
 
 Not a framework. Not a renderer. The missing primitive for layout-aware applications.
 
@@ -8,6 +8,86 @@ Not a framework. Not a renderer. The missing primitive for layout-aware applicat
 naive:  50 widgets, change 1 width     417K ops/s
 inval:  50 widgets, change 1 width   4,230K ops/s  (10x faster)
 ```
+
+---
+
+## The Problem
+
+Every developer building interactive UIs hits this wall:
+
+1. **Dashboards lag on resize** — Resize a sidebar, watch the entire dashboard stutter
+2. **Virtualized lists jitter** — Scroll position jumps when dynamic-height rows load
+3. **Responsive layouts cost too much** — Every breakpoint requires careful memoization
+4. **Performance debugging is guesswork** — "Why did this re-render?" has no answers
+
+**The root cause:** There's no abstraction for "what geometry changed, and what depends on it?"
+
+---
+
+## Why This Library?
+
+| Approach | Problem |
+|----------|---------|
+| Recompute everything | Wastes CPU. Causes jank on resize. |
+| useMemo / memo | Fragile. Easy to miss a dependency. No debug tools. |
+| Signals | Framework-coupled. State-focused. No layout semantics. |
+| Virtualization libs | Solve rendering, not dependency tracking. |
+
+**Inval gives you:**
+- **Explicit dependency graphs** — You declare what depends on what
+- **Debug tools** — `why(node)` tells you exactly why something recomputed
+- **Zero dependencies** — Pure TypeScript, works everywhere
+- **Framework agnostic** — React, Vue, Svelte, vanilla JS
+
+---
+
+## Install
+
+```bash
+npm install @blu3ph4ntom/inval
+bun add @blu3ph4ntom/inval
+pnpm add @blu3ph4ntom/inval
+```
+
+---
+
+## Why More Verbose?
+
+Yes, this is more typing:
+
+```typescript
+const area = node({
+  dependsOn: { w: width, h: height },
+  compute: ({ w, h }) => w * h
+})
+```
+
+vs this:
+
+```typescript
+const area = width * height
+```
+
+**But what are you trading for brevity?**
+
+```typescript
+// This is what your "simple" version hides:
+function getArea() {
+  // Did width or height change since last call?
+  // Do I need to recompute or can I return cached?
+  // What if I forgot a dependency and it's stale?
+  // How do I debug why it recomputed at 3am?
+  return width * height
+}
+```
+
+Inval handles all of that automatically:
+- **Caching** — Returns cached value if dependencies haven't changed
+- **Incremental updates** — Only recomputes what changed
+- **Debugging** — `why(node)` traces exact invalidation path
+- **Confidence** — 71 tests, deterministic behavior
+
+**For trivial cases** — use plain math. **When layout complexity grows** — Inval scales without becoming unmaintainable memo soup.
 
 ---
 
@@ -247,7 +327,7 @@ stats([root])
 
 ---
 
-## Enterprise Features
+## Features
 
 ### Zero Dependencies
 - No runtime deps — pure TypeScript
