@@ -1,0 +1,279 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro'
+import DocsSidebar from '../../components/docs/DocsSidebar.astro'
+import CodeBlock from '../../components/docs/CodeBlock.astro'
+import Callout from '../../components/docs/Callout.astro'
+
+const currentPage = '/docs/getting-started'
+---
+
+<DocsLayout title="Getting Started — Inval Docs" description="Install Inval and build your first dependency graph.">
+  <DocsSidebar slot="sidebar" currentPage={currentPage} />
+
+  <div class="docs-page">
+    <nav class="breadcrumb">
+      <a href="/docs/">Docs</a>
+      <span>/</span>
+      <span>Getting Started</span>
+    </nav>
+
+    <h1>Getting Started</h1>
+    <p class="lead">Get up and running with Inval in under 5 minutes.</p>
+
+    <section id="installation">
+      <h2>Installation</h2>
+      <p>Install via your preferred package manager:</p>
+
+      <CodeBlock 
+        lang="bash"
+        code={`npm install @blu3ph4ntom/inval
+
+# or
+bun add @blu3ph4ntom/inval
+
+# or
+pnpm add @blu3ph4ntom/inval`}
+      />
+
+      <p>Or use the IIFE bundle directly in a script tag:</p>
+
+      <CodeBlock 
+        filename="index.html"
+        lang="html"
+        code={`<script src="https://unpkg.com/@blu3ph4ntom/inval/dist/inval.iife.js"><\/script>
+<script>
+  const { input, node, why } = Inval
+  // ...
+<\/script>`}
+      />
+
+      <Callout type="info">
+        <p>Inval requires <strong>Node.js 18+</strong> and has <strong>zero runtime dependencies</strong>.</p>
+      </Callout>
+    </section>
+
+    <section id="quick-start">
+      <h2>Quick Start</h2>
+      <p>Let's build a simple dependency graph. We'll compute the area of a rectangle and see how Inval handles changes.</p>
+
+      <h3>Step 1: Import the API</h3>
+
+      <CodeBlock 
+        filename="step1.ts"
+        lang="typescript"
+        code={`import { input, node } from '@blu3ph4ntom/inval'`}
+      />
+
+      <h3>Step 2: Create input nodes</h3>
+      <p>Input nodes are leaf nodes. They hold values that external code sets.</p>
+
+      <CodeBlock 
+        filename="step2.ts"
+        lang="typescript"
+        code={`const width = input(800)
+const height = input(600)
+
+width.get()   // 800
+height.get()  // 600`}
+      />
+
+      <h3>Step 3: Create a computed node</h3>
+      <p>Computed nodes declare their dependencies and compute lazily.</p>
+
+      <CodeBlock 
+        filename="step3.ts"
+        lang="typescript"
+        code={`const area = node({
+  dependsOn: { w: width, h: height },
+  compute: ({ w, h }) => w * h
+})
+
+area.get()  // 480000 — computes on first access`}
+      />
+
+      <h3>Step 4: Change an input and observe</h3>
+
+      <CodeBlock 
+        filename="step4.ts"
+        lang="typescript"
+        code={`area.get()  // 480000 — cached, zero cost
+
+width.set(1000)
+area.get()  // 600000 — recomputes because width changed`}
+      />
+
+      <Callout type="tip">
+        <p>The key insight: <code>area.get()</code> returns the cached value if nothing changed. It only recomputes when a dependency is dirty.</p>
+      </Callout>
+    </section>
+
+    <section id="your-first-graph">
+      <h2>Your First Graph</h2>
+      <p>Let's build something more realistic — a dashboard layout with dependent widgets.</p>
+
+      <CodeBlock 
+        filename="dashboard.ts"
+        lang="typescript"
+        code={`import { input, node, batch } from '@blu3ph4ntom/inval'
+
+// External inputs
+const dashboardWidth = input(1200)
+const sidebarWidth = input(300)
+
+// Computed: content area width
+const contentWidth = node({
+  dependsOn: { dash: dashboardWidth, sidebar: sidebarWidth },
+  compute: ({ dash, sidebar }) => dash - sidebar
+})
+
+// Computed: chart width (60% of content)
+const chartWidth = node({
+  dependsOn: { content: contentWidth },
+  compute: ({ content }) => content * 0.6
+})
+
+// Computed: table width (40% of content)
+const tableWidth = node({
+  dependsOn: { content: contentWidth },
+  compute: ({ content }) => content * 0.4
+})
+
+// Initial values
+chartWidth.get()  // 540 (900 * 0.6)
+tableWidth.get()  // 360 (900 * 0.4)
+
+// Change sidebar — chart and table both update
+sidebarWidth.set(400)
+chartWidth.get()  // 480 (800 * 0.6)
+tableWidth.get()  // 320 (800 * 0.4)
+
+// Atomic update: change both at once
+const changed = batch(() => {
+  dashboardWidth.set(1400)
+  sidebarWidth.set(350)
+})
+// changed = Set of all dirtied nodes`}
+      />
+
+      <Callout type="warning">
+        <p>Always use <code>batch()</code> when setting multiple inputs at once. This ensures a single atomic update instead of cascading invalidations.</p>
+      </Callout>
+    </section>
+
+    <div class="page-nav">
+      <a href="/docs/" class="page-nav-prev">
+        <span>←</span>
+        <span>Introduction</span>
+      </a>
+      <a href="/docs/core-concepts" class="page-nav-next">
+        <span>Core Concepts</span>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .docs-page {
+    padding: 48px 64px;
+    max-width: 800px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .breadcrumb a {
+    color: var(--text-secondary);
+  }
+
+  .breadcrumb span:last-child {
+    color: var(--text-primary);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .lead {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-nav-prev,
+  .page-nav-next {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+
+  .page-nav-prev:hover,
+  .page-nav-next:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  @media (max-width: 1024px) {
+    .docs-page {
+      padding: 32px 24px;
+    }
+  }
+</style>

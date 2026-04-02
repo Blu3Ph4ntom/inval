@@ -1,0 +1,451 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro'
+import DocsSidebar from '../../components/docs/DocsSidebar.astro'
+import CodeBlock from '../../components/docs/CodeBlock.astro'
+import Callout from '../../components/docs/Callout.astro'
+
+const currentPage = '/docs/api-reference'
+---
+
+<DocsLayout title="API Reference — Inval Docs" description="Complete API reference for all Inval functions and types.">
+  <DocsSidebar slot="sidebar" currentPage={currentPage} />
+
+  <div class="docs-page">
+    <nav class="breadcrumb">
+      <a href="/docs/">Docs</a>
+      <span>/</span>
+      <span>API Reference</span>
+    </nav>
+
+    <h1>API Reference</h1>
+    <p class="lead">Complete reference for all exported functions and types.</p>
+
+    <section id="input">
+      <h2><code>input(value)</code></h2>
+      <p>Creates a leaf input node. External code sets the value.</p>
+
+      <h3>Signature</h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`function input<T>(value: T): InputNode<T>`}
+      />
+
+      <h3>Parameters</h3>
+      <div class="param-table">
+        <table>
+          <thead>
+            <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>value</code></td><td><code>T</code></td><td>Initial value of any type</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Returns</h3>
+      <p>An <code>InputNode&lt;T&gt;</code> with methods:</p>
+      <ul>
+        <li><code>get(): T</code> — returns current value</li>
+        <li><code>set(value: T): void</code> — updates value, marks dependents dirty</li>
+        <li><code>invalidate(): void</code> — forces invalidation of dependents</li>
+        <li><code>isDirty(): false</code> — inputs are never dirty</li>
+        <li><code>inspect(): InspectInfo</code> — debug information</li>
+        <li><code>dispose(): void</code> — disconnect from graph</li>
+      </ul>
+
+      <h3>Example</h3>
+      <CodeBlock 
+        filename="input-example.ts"
+        lang="typescript"
+        code={`const width = input(800)
+width.get()     // 800
+width.set(600)  // marks dependents dirty`}
+      />
+    </section>
+
+    <section id="node">
+      <h2><code>node(options)</code></h2>
+      <p>Creates a computed node with declared dependencies. Lazy evaluation, cached results.</p>
+
+      <h3>Signature</h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`function node<DependsOn extends Record<string, Node<any>>, R>(
+  options: {
+    dependsOn: DependsOn
+    compute: (values: ResolvedValues<DependsOn>) => R
+  }
+): ComputedNode<R>`}
+      />
+
+      <h3>Options</h3>
+      <div class="param-table">
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>dependsOn</code></td><td><code>Record&lt;string, Node&gt;</code></td><td>Map of names to dependency nodes</td></tr>
+            <tr><td><code>compute</code></td><td><code>(values) => R</code></td><td>Function that computes the result from resolved dependency values</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Returns</h3>
+      <p>A <code>ComputedNode&lt;R&gt;</code> with methods:</p>
+      <ul>
+        <li><code>get(): R</code> — returns cached value or recomputes if dirty</li>
+        <li><code>isDirty(): boolean</code> — true if any dependency changed</li>
+        <li><code>invalidate(): void</code> — forces recompute on next get()</li>
+        <li><code>inspect(): InspectInfo</code> — debug information</li>
+        <li><code>dispose(): void</code> — disconnect from graph</li>
+      </ul>
+
+      <h3>Example</h3>
+      <CodeBlock 
+        filename="node-example.ts"
+        lang="typescript"
+        code={`const width = input(800)
+const height = input(600)
+
+const area = node({
+  dependsOn: { w: width, h: height },
+  compute: ({ w, h }) => w * h
+})
+
+area.get()    // 480000
+area.get()    // 480000 (cached)
+width.set(1000)
+area.get()    // 600000 (recomputed)`}
+      />
+
+      <Callout type="danger">
+        <p>The <code>compute</code> function must be <strong>pure</strong>. No side effects. It may be called multiple times or not at all depending on cache state.</p>
+      </Callout>
+    </section>
+
+    <section id="batch">
+      <h2><code>batch(fn)</code></h2>
+      <p>Executes a function atomically. All input sets within the batch trigger a single invalidation walk. Returns the set of changed nodes.</p>
+
+      <h3>Signature</h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`function batch<T>(fn: () => T): T | Set<Node<any>>`}
+      />
+
+      <h3>Example</h3>
+      <CodeBlock 
+        filename="batch-example.ts"
+        lang="typescript"
+        code={`const changed = batch(() => {
+  width.set(1000)
+  height.set(800)
+})
+// changed = Set of all dirtied nodes`}
+      />
+    </section>
+
+    <section id="why">
+      <h2><code>why(node)</code></h2>
+      <p>Traces the invalidation path for a node. Returns an array of node names from the target back to the source inputs that caused invalidation.</p>
+
+      <h3>Signature</h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`function why(node: Node<any>): string[]`}
+      />
+
+      <h3>Example</h3>
+      <CodeBlock 
+        filename="why-example.ts"
+        lang="typescript"
+        code={`const cardHeight = node({
+  dependsOn: { textHeight, padding },
+  compute: ({ textHeight, padding }) => textHeight + padding
+})
+
+width.set(400)  // triggers textHeight recompute
+why(cardHeight) // ['cardHeight', 'textHeight', 'width']`}
+      />
+    </section>
+
+    <section id="ancestors-descendants">
+      <h2><code>ancestors(node)</code> / <code>descendants(node)</code></h2>
+      <p>Navigate the dependency graph. <code>ancestors</code> returns all upstream dependencies. <code>descendants</code> returns all downstream dependents.</p>
+
+      <h3>Signature</h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`function ancestors(node: Node<any>): Set<Node<any>>
+function descendants(node: Node<any>): Set<Node<any>>`}
+      />
+
+      <h3>Example</h3>
+      <CodeBlock 
+        filename="graph-nav.ts"
+        lang="typescript"
+        code={`const a = input(1)
+const b = node({ dependsOn: { a }, compute: ({ a }) => a * 2 })
+const c = node({ dependsOn: { b }, compute: ({ b }) => b + 1 })
+
+ancestors(c)   // Set { b, a }
+descendants(a) // Set { b, c }`}
+      />
+    </section>
+
+    <section id="todot">
+      <h2><code>toDot(nodes)</code></h2>
+      <p>Exports the dependency graph as Graphviz DOT format for visualization.</p>
+
+      <h3>Signature</h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`function toDot(nodes: Node<any>[]): string`}
+      />
+
+      <h3>Example</h3>
+      <CodeBlock 
+        filename="dot-example.ts"
+        lang="typescript"
+        code={`console.log(toDot([area]))
+// Output:
+// digraph G {
+//   "width" -> "area"
+//   "height" -> "area"
+// }
+// Paste to graphviz.online to visualize`}
+      />
+    </section>
+
+    <section id="stats">
+      <h2><code>stats(nodes)</code></h2>
+      <p>Returns statistics about the dependency graph.</p>
+
+      <h3>Signature</h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`function stats(nodes: Node<any[]>): {
+  nodeCount: number
+  inputCount: number
+  computedCount: number
+  edgeCount: number
+  totalComputeCalls: number
+}`}
+      />
+
+      <h3>Example</h3>
+      <CodeBlock 
+        filename="stats-example.ts"
+        lang="typescript"
+        code={`stats([root])
+// {
+//   nodeCount: 5,
+//   inputCount: 2,
+//   computedCount: 3,
+//   edgeCount: 4,
+//   totalComputeCalls: 12
+// }`}
+      />
+    </section>
+
+    <section id="types">
+      <h2>TypeScript Types</h2>
+
+      <h3><code>InputNode&lt;T&gt;</code></h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`interface InputNode<T> {
+  get(): T
+  set(value: T): void
+  invalidate(): void
+  isDirty(): false
+  inspect(): InspectInfo
+  dispose(): void
+}`}
+      />
+
+      <h3><code>ComputedNode&lt;T&gt;</code></h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`interface ComputedNode<T> {
+  get(): T
+  isDirty(): boolean
+  invalidate(): void
+  inspect(): InspectInfo
+  dispose(): void
+}`}
+      />
+
+      <h3><code>InspectInfo</code></h3>
+      <CodeBlock 
+        lang="typescript"
+        code={`interface InspectInfo {
+  id: string
+  name: string
+  type: 'input' | 'computed'
+  value?: any
+  dirty: boolean
+  dependencyCount: number
+  dependentCount: number
+}`}
+      />
+    </section>
+
+    <div class="page-nav">
+      <a href="/docs/core-concepts" class="page-nav-prev">
+        <span>←</span>
+        <span>Core Concepts</span>
+      </a>
+      <a href="/docs/guides/virtualized-lists" class="page-nav-next">
+        <span>Guides</span>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .docs-page {
+    padding: 48px 64px;
+    max-width: 800px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .breadcrumb a { color: var(--text-secondary); }
+  .breadcrumb span:last-child { color: var(--text-primary); }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .lead {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h2 code {
+    font-size: 24px;
+    background: none;
+    padding: 0;
+    color: var(--text-primary);
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 32px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  ul {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    padding-left: 24px;
+  }
+
+  ul li { margin-bottom: 8px; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .param-table {
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+
+  .param-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .param-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .param-table td {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .param-table td code {
+    font-size: 0.85em;
+  }
+
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-nav-prev,
+  .page-nav-next {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+
+  .page-nav-prev:hover,
+  .page-nav-next:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  @media (max-width: 1024px) {
+    .docs-page { padding: 32px 24px; }
+  }
+</style>

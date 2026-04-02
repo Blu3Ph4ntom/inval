@@ -1,0 +1,186 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro'
+import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import CodeBlock from '../../../components/docs/CodeBlock.astro'
+import Callout from '../../../components/docs/Callout.astro'
+
+const currentPage = '/docs/guides/virtualized-lists'
+---
+
+<DocsLayout title="Virtualized Lists — Inval Guides" description="Build variable-height virtualized lists with Inval.">
+  <DocsSidebar slot="sidebar" currentPage={currentPage} />
+
+  <div class="docs-page">
+    <nav class="breadcrumb">
+      <a href="/docs/">Docs</a>
+      <span>/</span>
+      <a href="/docs/#guides">Guides</a>
+      <span>/</span>
+      <span>Virtualized Lists</span>
+    </nav>
+
+    <h1>Virtualized Lists</h1>
+    <p class="lead">Build variable-height virtualized lists without scroll jank.</p>
+
+    <section id="the-problem">
+      <h2>The Problem</h2>
+      <p>Virtualized lists render only visible rows to save memory. But when rows have dynamic heights, the total scroll height changes as rows load. This causes scroll position jumps.</p>
+      <p>Popular libraries like TanStack Virtual and react-window have hundreds of open issues about this. The root cause: no dependency graph means recomputing ALL row heights on ANY change.</p>
+    </section>
+
+    <section id="the-solution">
+      <h2>The Inval Solution</h2>
+      <p>Model row heights as computed nodes that depend on viewport width and content. When width changes, only affected rows recompute. Scroll position stays stable.</p>
+
+      <CodeBlock 
+        filename="virtualized-list.ts"
+        lang="typescript"
+        code={`import { input, node } from '@blu3ph4ntom/inval'
+
+// External inputs
+const viewportWidth = input(800)
+const scrollTop = input(0)
+const items = input(generateItems(1000))
+
+// Compute row heights based on content and width
+const rowHeights = node({
+  dependsOn: { width: viewportWidth, items },
+  compute: ({ width, items }) => items.map(item => {
+    const charsPerLine = Math.floor(width / 8)
+    const lines = Math.ceil(item.text.length / charsPerLine)
+    return lines * 20 + 16 // line height + padding
+  })
+})
+
+// Cumulative offsets for scroll calculation
+const rowOffsets = node({
+  dependsOn: { heights: rowHeights },
+  compute: ({ heights }) => {
+    const offsets = [0]
+    for (let i = 1; i < heights.length; i++) {
+      offsets.push(offsets[i - 1] + heights[i - 1])
+    }
+    return offsets
+  }
+})
+
+// Total scrollable height
+const totalHeight = node({
+  dependsOn: { heights: rowHeights },
+  compute: ({ heights }) => heights.reduce((a, b) => a + b, 0)
+})
+
+// Visible range based on scroll position
+const visibleRange = node({
+  dependsOn: { offsets: rowOffsets, scroll: scrollTop, heights: rowHeights },
+  compute: ({ offsets, scroll, heights }) => {
+    const viewportHeight = 600
+    let start = 0
+    while (start < offsets.length - 1 && offsets[start + 1] < scroll) {
+      start++
+    }
+    let end = start
+    while (end < offsets.length && offsets[end] < scroll + viewportHeight) {
+      end++
+    }
+    return { start, end, count: end - start }
+  }
+})
+
+// Width change: only rowHeights + dependents dirty
+viewportWidth.set(400)
+// rowHeights.isDirty() → true
+// totalHeight.isDirty() → true
+// visibleRange.isDirty() → true
+
+// Scroll change: ONLY visibleRange dirty
+scrollTop.set(500)
+// rowHeights.isDirty() → false
+// totalHeight.isDirty() → false
+// visibleRange.isDirty() → true`}
+      />
+
+      <Callout type="tip">
+        <p>The key insight: scrolling only invalidates <code>visibleRange</code>. Row heights stay cached. This is what makes Inval faster than naive approaches.</p>
+      </Callout>
+    </section>
+
+    <section id="integration">
+      <h2>Framework Integration</h2>
+      <p>Connect Inval to your rendering framework. Here's a React pattern:</p>
+
+      <CodeBlock 
+        filename="VirtualList.tsx"
+        lang="typescript"
+        code={`import { input, node } from '@blu3ph4ntom/inval'
+import { useRef, useEffect, useState } from 'react'
+
+function VirtualList({ items, renderItem }) {
+  const widthInput = useRef(input(800))
+  const scrollInput = useRef(input(0))
+  const itemsInput = useRef(input(items))
+
+  const visibleRange = useRef(node({
+    dependsOn: {
+      offsets: /* ... */,
+      scroll: scrollInput.current,
+      heights: /* ... */,
+    },
+    compute: ({ offsets, scroll, heights }) => {
+      // compute visible range
+    }
+  }))
+
+  const [range, setRange] = useState(visibleRange.current.get())
+
+  useEffect(() => {
+    widthInput.current.set(containerWidth)
+  }, [containerWidth])
+
+  useEffect(() => {
+    const onScroll = () => {
+      scrollInput.current.set(container.scrollTop)
+      setRange(visibleRange.current.get())
+    }
+    container.addEventListener('scroll', onScroll)
+    return () => container.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <div ref={containerRef}>
+      {items.slice(range.start, range.end).map(renderItem)}
+    </div>
+  )
+}`}
+      />
+    </section>
+
+    <div class="page-nav">
+      <a href="/docs/api-reference" class="page-nav-prev">
+        <span>←</span>
+        <span>API Reference</span>
+      </a>
+      <a href="/docs/guides/dashboards" class="page-nav-next">
+        <span>Dashboards</span>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .docs-page { padding: 48px 64px; max-width: 800px; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .breadcrumb a { color: var(--text-secondary); }
+  .breadcrumb span:last-child { color: var(--text-primary); }
+  h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; margin-bottom: 12px; }
+  .lead { font-size: 18px; color: var(--text-secondary); margin-bottom: 48px; }
+  h2 { font-family: var(--font-display); font-size: 28px; font-weight: 600; margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 32px; margin-bottom: 12px; }
+  p { color: var(--text-secondary); font-size: 15px; line-height: 1.7; margin-bottom: 16px; }
+  code { font-family: var(--font-mono); font-size: 0.9em; background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .page-nav-prev, .page-nav-next { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); transition: all 0.2s ease; }
+  .page-nav-prev:hover, .page-nav-next:hover { border-color: var(--accent); color: var(--text-primary); text-decoration: none; }
+  @media (max-width: 1024px) { .docs-page { padding: 32px 24px; } }
+</style>

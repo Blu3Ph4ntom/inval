@@ -1,0 +1,92 @@
+---
+export interface Props {
+  type?: 'info' | 'warning' | 'tip' | 'danger'
+  title?: string
+}
+
+const { type = 'info', title } = Astro.props
+
+const icons: Record<string, string> = {
+  info: 'ℹ️',
+  warning: '⚠️',
+  tip: '💡',
+  danger: '🚨',
+}
+
+const titles: Record<string, string> = {
+  info: 'Note',
+  warning: 'Warning',
+  tip: 'Tip',
+  danger: 'Important',
+}
+---
+
+<div class={`callout callout-${type}`}>
+  <div class="callout-header">
+    <span class="callout-icon">{icons[type]}</span>
+    <span class="callout-title">{title || titles[type]}</span>
+  </div>
+  <div class="callout-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout {
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--accent);
+    background: var(--bg-secondary);
+    margin: var(--space-lg) 0;
+  }
+
+  .callout-info {
+    border-left-color: var(--accent);
+  }
+
+  .callout-warning {
+    border-left-color: var(--warning);
+    background: rgba(251, 191, 36, 0.05);
+  }
+
+  .callout-tip {
+    border-left-color: var(--success);
+    background: rgba(74, 222, 128, 0.05);
+  }
+
+  .callout-danger {
+    border-left-color: var(--error);
+    background: rgba(248, 113, 113, 0.05);
+  }
+
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  .callout-icon {
+    font-size: 16px;
+  }
+
+  .callout-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .callout-content {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .callout-content p {
+    margin-bottom: var(--space-sm);
+  }
+
+  .callout-content p:last-child {
+    margin-bottom: 0;
+  }
+</style>

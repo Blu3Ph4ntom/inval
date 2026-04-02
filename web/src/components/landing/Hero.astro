@@ -1,0 +1,212 @@
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge fade-in">
+      <span class="badge-dot"></span>
+      <code>npm install @blu3ph4ntom/inval</code>
+    </div>
+
+    <h1 class="hero-title fade-in fade-in-delay-1">
+      The layout<br />
+      <span class="accent-text">invalidation</span> engine.
+    </h1>
+
+    <p class="hero-sub fade-in fade-in-delay-2">
+      Declare what depends on what. The engine handles the rest.<br />
+      Deterministic. Incremental. Zero dependencies.
+    </p>
+
+    <div class="hero-ctas fade-in fade-in-delay-3">
+      <a href="/docs" class="btn-primary btn-lg">Get Started</a>
+      <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener" class="btn-secondary btn-lg">
+        View on GitHub
+      </a>
+    </div>
+
+    <div class="hero-perf fade-in fade-in-delay-4">
+      <div class="perf-row">
+        <span class="perf-label">naive</span>
+        <div class="perf-bar"><div class="perf-bar-fill naive-fill"></div></div>
+        <span class="perf-val">417K ops/s</span>
+      </div>
+      <div class="perf-row">
+        <span class="perf-label">inval</span>
+        <div class="perf-bar"><div class="perf-bar-fill inval-fill"></div></div>
+        <span class="perf-val accent-val">4,230K ops/s</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 160px 0 100px;
+  }
+
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-8);
+  }
+
+  .badge-dot {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 8vw, 80px);
+    font-weight: 600;
+    line-height: 1.05;
+    color: var(--text-primary);
+    margin-bottom: var(--space-6);
+    letter-spacing: -0.02em;
+  }
+
+  .accent-text {
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto var(--space-8);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg-primary);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: border-color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    transform: scale(1.02);
+  }
+
+  .btn-lg {
+    font-size: 16px;
+    padding: 14px 28px;
+  }
+
+  .hero-perf {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .perf-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .perf-label {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-muted);
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .perf-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .perf-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+
+  .naive-fill {
+    width: 10%;
+    background: var(--warning);
+    animation: bar-fill 1.5s ease-out;
+  }
+
+  .inval-fill {
+    width: 100%;
+    background: var(--accent);
+    animation: bar-fill 1.5s ease-out 0.3s both;
+  }
+
+  .perf-val {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-muted);
+    min-width: 90px;
+  }
+
+  .accent-val {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  @keyframes bar-fill {
+    from {
+      width: 0;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+</style>

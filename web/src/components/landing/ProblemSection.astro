@@ -1,0 +1,165 @@
+<section class="section problem-section" id="problem">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-tag">// The Problem</span>
+      <h2 class="section-title">Every resize. Every scroll.<br /><span class="text-muted">Recomputing everything.</span></h2>
+    </div>
+    
+    <div class="problem-grid stagger">
+      <div class="problem-card">
+        <div class="problem-icon">&#9889;</div>
+        <h3>Dashboard lag on resize</h3>
+        <p>Resize a sidebar, watch the entire dashboard stutter. Every component recalculates.</p>
+      </div>
+      
+      <div class="problem-card">
+        <div class="problem-icon">&#128228;</div>
+        <h3>Virtualized list jitter</h3>
+        <p>Scroll position jumps when dynamic-height rows load. Users see flickering content.</p>
+      </div>
+      
+      <div class="problem-card">
+        <div class="problem-icon">&#128208;</div>
+        <h3>Responsive layout cost</h3>
+        <p>Every breakpoint requires careful memoization. Miss one dependency and it's stale.</p>
+      </div>
+      
+      <div class="problem-card">
+        <div class="problem-icon">&#128269;</div>
+        <h3>Performance debugging is guesswork</h3>
+        <p>"Why did this re-render?" has no answers. No visibility into what changed and why.</p>
+      </div>
+    </div>
+    
+    <div class="evidence fade-in">
+      <p class="evidence-label">Real issues from popular libraries:</p>
+      <div class="evidence-list">
+        <a href="https://github.com/TanStack/virtual/issues/832" target="_blank" rel="noopener" class="evidence-item">
+          <span class="evidence-lib">TanStack Virtual</span>
+          <span class="evidence-issue">#832 — Scrolling with dynamic height lags and stutters</span>
+        </a>
+        <a href="https://github.com/bvaughn/react-window/issues/741" target="_blank" rel="noopener" class="evidence-item">
+          <span class="evidence-lib">react-window</span>
+          <span class="evidence-issue">#741 — VariableSizeList causes major scroll jitters</span>
+        </a>
+        <a href="https://github.com/TanStack/virtual/issues/659" target="_blank" rel="noopener" class="evidence-item">
+          <span class="evidence-lib">TanStack Virtual</span>
+          <span class="evidence-issue">#659 — Scrolling up with dynamic heights stutters</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: var(--space-4xl) 0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .section-tag {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .problem-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  }
+
+  .problem-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .problem-icon {
+    font-size: 32px;
+    margin-bottom: var(--space-md);
+  }
+
+  .problem-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+  }
+
+  .problem-card p {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  .evidence {
+    margin-top: var(--space-2xl);
+  }
+
+  .evidence-label {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: var(--space-md);
+  }
+
+  .evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .evidence-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: border-color var(--transition-base);
+  }
+
+  .evidence-item:hover {
+    border-color: var(--border-hover, var(--accent));
+  }
+
+  .evidence-lib {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-primary);
+    min-width: 160px;
+  }
+
+  .evidence-issue {
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  @media (max-width: 768px) {
+    .problem-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

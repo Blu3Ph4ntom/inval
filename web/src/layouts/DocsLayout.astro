@@ -1,0 +1,119 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Inval Documentation' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#09090b" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    <title>{title}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="stylesheet" href="../styles/global.css" />
+
+    <style is:inline>
+      .docs-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 100vh;
+      }
+
+      .docs-sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        padding: var(--space-xl);
+        border-right: 1px solid var(--border);
+        background: var(--bg-secondary);
+      }
+
+      .docs-content {
+        padding: var(--space-2xl) var(--space-3xl);
+        max-width: 800px;
+      }
+
+      @media (max-width: 1024px) {
+        .docs-layout {
+          grid-template-columns: 1fr;
+        }
+        .docs-sidebar {
+          position: fixed;
+          left: -280px;
+          top: 0;
+          width: 280px;
+          z-index: 100;
+          transition: left var(--transition-base);
+        }
+        .docs-sidebar.open {
+          left: 0;
+        }
+        .docs-content {
+          padding: var(--space-xl);
+        }
+      }
+
+      .fade-in,
+      .stagger {
+        opacity: 0;
+        transform: translateY(1rem);
+        transition: opacity var(--transition-base), transform var(--transition-base);
+      }
+
+      .fade-in.visible,
+      .stagger.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .stagger.visible:nth-child(1) { transition-delay: 0ms; }
+      .stagger.visible:nth-child(2) { transition-delay: 50ms; }
+      .stagger.visible:nth-child(3) { transition-delay: 100ms; }
+      .stagger.visible:nth-child(4) { transition-delay: 150ms; }
+      .stagger.visible:nth-child(5) { transition-delay: 200ms; }
+      .stagger.visible:nth-child(6) { transition-delay: 250ms; }
+    </style>
+  </head>
+  <body>
+    <div class="docs-layout">
+      <aside class="docs-sidebar">
+        <slot name="sidebar" />
+      </aside>
+      <main class="docs-content">
+        <slot />
+      </main>
+    </div>
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-in, .stagger').forEach(el => observer.observe(el));
+      });
+    </script>
+  </body>
+</html>

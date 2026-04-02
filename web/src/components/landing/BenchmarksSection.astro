@@ -1,0 +1,130 @@
+<section class="section benchmarks-section" id="benchmarks">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-tag">// Performance</span>
+      <h2 class="section-title">Numbers don't lie.<br /><span class="text-muted">Measured in millions of ops/sec.</span></h2>
+    </div>
+    
+    <div class="bench-grid stagger">
+      <div class="bench-card fade-in">
+        <span class="bench-label">input.get() cached</span>
+        <span class="bench-value">34.6M</span>
+        <span class="bench-unit">ops/s</span>
+      </div>
+      
+      <div class="bench-card fade-in">
+        <span class="bench-label">computed.get() cached</span>
+        <span class="bench-value">44.3M</span>
+        <span class="bench-unit">ops/s</span>
+      </div>
+      
+      <div class="bench-card fade-in">
+        <span class="bench-label">input.set() + get() cycle</span>
+        <span class="bench-value">1.9M</span>
+        <span class="bench-unit">ops/s</span>
+      </div>
+      
+      <div class="bench-card fade-in">
+        <span class="bench-label">chain depth 10: set+get</span>
+        <span class="bench-value">503K</span>
+        <span class="bench-unit">ops/s</span>
+      </div>
+      
+      <div class="bench-card fade-in">
+        <span class="bench-label">diamond (1→4→1): set+get</span>
+        <span class="bench-value">1.5M</span>
+        <span class="bench-unit">ops/s</span>
+      </div>
+      
+      <div class="bench-card fade-in">
+        <span class="bench-label">100 chains: set 1, get 1</span>
+        <span class="bench-value">3.7M</span>
+        <span class="bench-unit">ops/s</span>
+      </div>
+    </div>
+    
+    <div class="bench-highlight fade-in">
+      <div class="highlight-card">
+        <span class="highlight-number">10×</span>
+        <span class="highlight-text">faster than naive approach on 50 widgets</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .benchmarks-section {
+    padding: var(--space-4xl) 0;
+  }
+  .bench-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+  .bench-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all var(--transition-base);
+  }
+  .bench-card:hover {
+    border-color: var(--accent);
+  }
+  .bench-label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: var(--space-sm);
+  }
+  .bench-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .bench-unit {
+    display: block;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+  .bench-highlight {
+    margin-top: var(--space-2xl);
+    text-align: center;
+  }
+  .highlight-card {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-lg);
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg) var(--space-2xl);
+  }
+  .highlight-number {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .highlight-text {
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+  @media (max-width: 1024px) {
+    .bench-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .bench-grid {
+      grid-template-columns: 1fr;
+    }
+    .highlight-card {
+      flex-direction: column;
+    }
+  }
+</style>

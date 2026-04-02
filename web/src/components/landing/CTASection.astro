@@ -1,0 +1,81 @@
+<section class="section cta-section">
+  <div class="container">
+    <div class="cta-card fade-in">
+      <h2 class="cta-title">Build faster layouts.<br />Ship smoother UIs.</h2>
+      <p class="cta-sub">Join developers who've replaced layout jank with deterministic performance.</p>
+      <div class="cta-buttons">
+        <a href="/docs" class="btn-primary btn-lg">Read the Docs</a>
+        <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener" class="btn-secondary btn-lg">
+          Star on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-section {
+    padding: var(--space-4xl) 0;
+  }
+  .cta-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl) var(--space-2xl);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: var(--space-md);
+  }
+  .cta-sub {
+    color: var(--text-secondary);
+    font-size: 18px;
+    max-width: 480px;
+    margin: 0 auto var(--space-xl);
+  }
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg-primary);
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 16px;
+    transition: all var(--transition-base);
+  }
+  .btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-glow);
+  }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 16px;
+    transition: all var(--transition-base);
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+  }
+</style>

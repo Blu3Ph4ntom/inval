@@ -1,0 +1,248 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro'
+import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import CodeBlock from '../../../components/docs/CodeBlock.astro'
+import Callout from '../../../components/docs/Callout.astro'
+
+const currentPage = '/docs/examples/'
+---
+
+<DocsLayout title="Examples — Inval Docs" description="Real-world examples of Inval in action.">
+  <DocsSidebar slot="sidebar" currentPage={currentPage} />
+
+  <div class="docs-page">
+    <nav class="breadcrumb">
+      <a href="/docs/">Docs</a>
+      <span>/</span>
+      <span>Examples</span>
+    </nav>
+
+    <h1>Examples</h1>
+    <p class="lead">Real-world examples of Inval in action.</p>
+
+    <section id="calculator">
+      <h2>Basic Calculator</h2>
+      <p>A simple dependency chain: two inputs, one computed result.</p>
+
+      <CodeBlock 
+        filename="calculator.ts"
+        lang="typescript"
+        code={`import { input, node } from '@blu3ph4ntom/inval'
+
+const a = input(10)
+const b = input(20)
+
+const sum = node({
+  dependsOn: { a, b },
+  compute: ({ a, b }) => a + b
+})
+
+const product = node({
+  dependsOn: { a, b },
+  compute: ({ a, b }) => a * b
+})
+
+const average = node({
+  dependsOn: { sum, count: input(2) },
+  compute: ({ sum, count }) => sum / count
+})
+
+sum.get()      // 30
+product.get()  // 200
+average.get()  // 15
+
+a.set(50)
+sum.get()      // 70 (recomputed)
+product.get()  // 1000 (recomputed)
+average.get()  // 35 (recomputed)`}
+      />
+    </section>
+
+    <section id="list">
+      <h2>Variable-Height Virtualized List</h2>
+      <p>Full virtualized list with dynamic row heights. Only visible range recomputes on scroll.</p>
+
+      <CodeBlock 
+        filename="virtualized-list.ts"
+        lang="typescript"
+        code={`import { input, node } from '@blu3ph4ntom/inval'
+
+const viewportWidth = input(800)
+const scrollTop = input(0)
+const items = input(generateItems(1000))
+
+const rowHeights = node({
+  dependsOn: { width: viewportWidth, items },
+  compute: ({ width, items }) => items.map(item => {
+    const charsPerLine = Math.floor(width / 8)
+    const lines = Math.ceil(item.text.length / charsPerLine)
+    return lines * 20 + 16
+  })
+})
+
+const totalHeight = node({
+  dependsOn: { heights: rowHeights },
+  compute: ({ heights }) => heights.reduce((a, b) => a + b, 0)
+})
+
+const visibleRange = node({
+  dependsOn: { scroll: scrollTop, heights: rowHeights },
+  compute: ({ scroll, heights }) => {
+    const viewportHeight = 600
+    let offset = 0, start = 0
+    while (start < heights.length && offset + heights[start] < scroll) {
+      offset += heights[start]
+      start++
+    }
+    let end = start, visibleOffset = offset
+    while (end < heights.length && visibleOffset < scroll + viewportHeight) {
+      visibleOffset += heights[end]
+      end++
+    }
+    return { start, end }
+  }
+})
+
+// Scroll: only visibleRange dirty
+scrollTop.set(500)
+rowHeights.isDirty()   // false
+visibleRange.isDirty() // true
+
+// Resize: everything dirty
+viewportWidth.set(400)
+rowHeights.isDirty()   // true
+totalHeight.isDirty()  // true
+visibleRange.isDirty() // true`}
+      />
+    </section>
+
+    <section id="dashboard">
+      <h2>Dashboard with Widgets</h2>
+      <p>Multi-widget layout with dependent dimensions. Sidebar resize cascades intelligently.</p>
+
+      <CodeBlock 
+        filename="dashboard.ts"
+        lang="typescript"
+        code={`import { input, node, batch } from '@blu3ph4ntom/inval'
+
+const dashboardWidth = input(1200)
+const sidebarWidth = input(300)
+const zoomLevel = input(1)
+
+const contentWidth = node({
+  dependsOn: { dash: dashboardWidth, sidebar: sidebarWidth },
+  compute: ({ dash, sidebar }) => dash - sidebar
+})
+
+const chartWidth = node({
+  dependsOn: { content: contentWidth },
+  compute: ({ content }) => content * 0.6
+})
+
+const chartHeight = node({
+  dependsOn: { zoom: zoomLevel },
+  compute: ({ zoom }) => 400 * zoom
+})
+
+const tableWidth = node({
+  dependsOn: { content: contentWidth },
+  compute: ({ content }) => content * 0.4
+})
+
+const tableRowHeight = node({
+  dependsOn: { zoom: zoomLevel },
+  compute: ({ zoom }) => 40 * zoom
+})
+
+// Initial
+chartWidth.get()     // 540
+tableWidth.get()     // 360
+chartHeight.get()    // 400
+tableRowHeight.get() // 40
+
+// Sidebar resize
+sidebarWidth.set(400)
+chartWidth.get()     // 480 (dirty)
+tableWidth.get()     // 320 (dirty)
+chartHeight.isDirty()    // false
+tableRowHeight.isDirty() // false
+
+// Zoom change
+zoomLevel.set(1.5)
+chartHeight.get()    // 600 (dirty)
+tableRowHeight.get() // 60 (dirty)
+chartWidth.isDirty()     // false
+tableWidth.isDirty()     // false`}
+      />
+    </section>
+
+    <section id="kanban">
+      <h2>Kanban Board</h2>
+      <p>Column widths, card heights, and scroll positions tracked as a dependency graph.</p>
+
+      <CodeBlock 
+        filename="kanban.ts"
+        lang="typescript"
+        code={`import { input, node, batch } from '@blu3ph4ntom/inval'
+
+const boardWidth = input(1400)
+const columnCount = input(4)
+
+const columnWidth = node({
+  dependsOn: { board: boardWidth, count: columnCount },
+  compute: ({ board, count }) => (board - (count - 1) * 16) / count
+})
+
+const cardHeight = node({
+  dependsOn: { colWidth: columnWidth },
+  compute: ({ colWidth }) => {
+    // Cards scale proportionally to column width
+    return Math.max(80, colWidth * 0.3)
+  }
+})
+
+const columnHeight = node({
+  dependsOn: { cardH: cardHeight, cardCount: input(5) },
+  compute: ({ cardH, cardCount }) => cardH * cardCount + 40
+})
+
+// Resize board
+boardWidth.set(1200)
+columnWidth.get()  // 288 (recomputed)
+cardHeight.get()   // 86.4 (recomputed)
+columnHeight.get() // 472 (recomputed)
+
+// Add a column
+batch(() => {
+  columnCount.set(5)
+  boardWidth.set(1600)
+})
+columnWidth.get()  // 304 (single recomputation)`}
+      />
+    </section>
+
+    <div class="page-nav">
+      <a href="/docs/guides/debugging" class="page-nav-prev">
+        <span>←</span>
+        <span>Debugging</span>
+      </a>
+      <div></div>
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .docs-page { padding: 48px 64px; max-width: 800px; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .breadcrumb a { color: var(--text-secondary); }
+  .breadcrumb span:last-child { color: var(--text-primary); }
+  h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; margin-bottom: 12px; }
+  .lead { font-size: 18px; color: var(--text-secondary); margin-bottom: 48px; }
+  h2 { font-family: var(--font-display); font-size: 28px; font-weight: 600; margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  p { color: var(--text-secondary); font-size: 15px; line-height: 1.7; margin-bottom: 16px; }
+  code { font-family: var(--font-mono); font-size: 0.9em; background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .page-nav-prev, .page-nav-next { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); transition: all 0.2s ease; }
+  .page-nav-prev:hover, .page-nav-next:hover { border-color: var(--accent); color: var(--text-primary); text-decoration: none; }
+  @media (max-width: 1024px) { .docs-page { padding: 32px 24px; } }
+</style>

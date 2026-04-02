@@ -1,0 +1,139 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro'
+import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import CodeBlock from '../../../components/docs/CodeBlock.astro'
+import Callout from '../../../components/docs/Callout.astro'
+
+const currentPage = '/docs/guides/react-integration'
+---
+
+<DocsLayout title="React Integration — Inval Guides" description="Use Inval with React components and hooks.">
+  <DocsSidebar slot="sidebar" currentPage={currentPage} />
+
+  <div class="docs-page">
+    <nav class="breadcrumb">
+      <a href="/docs/">Docs</a>
+      <span>/</span>
+      <a href="/docs/#guides">Guides</a>
+      <span>/</span>
+      <span>React Integration</span>
+    </nav>
+
+    <h1>React Integration</h1>
+    <p class="lead">Use Inval with React components, hooks, and the rendering lifecycle.</p>
+
+    <section id="pattern">
+      <h2>The Pattern</h2>
+      <p>Inval is framework-agnostic. With React, you create Inval nodes outside components (or in refs) and subscribe to changes to trigger re-renders.</p>
+
+      <CodeBlock 
+        filename="useInval.ts"
+        lang="typescript"
+        code={`import { useRef, useEffect, useState } from 'react'
+import { input, node, ComputedNode } from '@blu3ph4ntom/inval'
+
+// Custom hook: creates an input node synced with React state
+function useInvalInput<T>(initialValue: T) {
+  const nodeRef = useRef<InputNode<T>>(input(initialValue))
+  const [value, setValue] = useState(initialValue)
+
+  useEffect(() => {
+    nodeRef.current.set(value)
+  }, [value])
+
+  return [nodeRef.current, setValue] as const
+}
+
+// Custom hook: subscribes to a computed node
+function useInvalNode<T>(computedNode: ComputedNode<T>) {
+  const [value, setValue] = useState(() => computedNode.get())
+
+  useEffect(() => {
+    // Re-read when React re-renders (parent changed deps)
+    setValue(computedNode.get())
+  })
+
+  return value
+}`}
+      />
+    </section>
+
+    <section id="example">
+      <h2>Example: Responsive Chart</h2>
+
+      <CodeBlock 
+        filename="Chart.tsx"
+        lang="typescript"
+        code={`import { useRef, useEffect, useState } from 'react'
+import { input, node } from '@blu3ph4ntom/inval'
+
+// Create graph outside component
+const containerWidth = input(800)
+const chartWidth = node({
+  dependsOn: { w: containerWidth },
+  compute: ({ w }) => w * 0.8
+})
+
+function Chart() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(800)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const observer = new ResizeObserver(entries => {
+      const w = entries[0].contentRect.width
+      containerWidth.set(w)
+      setWidth(w)
+    })
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const computedWidth = chartWidth.get()
+
+  return (
+    <div ref={ref}>
+      <svg width={computedWidth} height={400}>
+        {/* chart content */}
+      </svg>
+    </div>
+  )
+}`}
+      />
+
+      <Callout type="warning">
+        <p>Don't create Inval nodes inside the component body — they'll be recreated on every render. Use <code>useRef</code> or module-level declarations.</p>
+      </Callout>
+    </section>
+
+    <div class="page-nav">
+      <a href="/docs/guides/dashboards" class="page-nav-prev">
+        <span>←</span>
+        <span>Dashboards</span>
+      </a>
+      <a href="/docs/guides/debugging" class="page-nav-next">
+        <span>Debugging</span>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .docs-page { padding: 48px 64px; max-width: 800px; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .breadcrumb a { color: var(--text-secondary); }
+  .breadcrumb span:last-child { color: var(--text-primary); }
+  h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; margin-bottom: 12px; }
+  .lead { font-size: 18px; color: var(--text-secondary); margin-bottom: 48px; }
+  h2 { font-family: var(--font-display); font-size: 28px; font-weight: 600; margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  p { color: var(--text-secondary); font-size: 15px; line-height: 1.7; margin-bottom: 16px; }
+  code { font-family: var(--font-mono); font-size: 0.9em; background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .page-nav-prev, .page-nav-next { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); transition: all 0.2s ease; }
+  .page-nav-prev:hover, .page-nav-next:hover { border-color: var(--accent); color: var(--text-primary); text-decoration: none; }
+  @media (max-width: 1024px) { .docs-page { padding: 32px 24px; } }
+</style>

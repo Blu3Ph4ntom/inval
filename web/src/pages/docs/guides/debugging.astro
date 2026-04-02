@@ -1,0 +1,142 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro'
+import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import CodeBlock from '../../../components/docs/CodeBlock.astro'
+import Callout from '../../../components/docs/Callout.astro'
+
+const currentPage = '/docs/guides/debugging'
+---
+
+<DocsLayout title="Debugging — Inval Guides" description="Debug performance issues with why(), inspect(), and toDot().">
+  <DocsSidebar slot="sidebar" currentPage={currentPage} />
+
+  <div class="docs-page">
+    <nav class="breadcrumb">
+      <a href="/docs/">Docs</a>
+      <span>/</span>
+      <a href="/docs/#guides">Guides</a>
+      <span>/</span>
+      <span>Debugging</span>
+    </nav>
+
+    <h1>Debugging</h1>
+    <p class="lead">Use Inval's debug tools to trace invalidations and understand your graph.</p>
+
+    <section id="why">
+      <h2>Tracing with why()</h2>
+      <p>When a node recomputes unexpectedly, use <code>why()</code> to trace the invalidation path back to the source.</p>
+
+      <CodeBlock 
+        filename="debug-why.ts"
+        lang="typescript"
+        code={`import { input, node, why } from '@blu3ph4ntom/inval'
+
+const width = input(800)
+const height = input(600)
+const area = node({
+  dependsOn: { w: width, h: height },
+  compute: ({ w, h }) => w * h
+})
+
+width.set(1000)
+why(area)  // ['area', 'width']
+
+// The path tells you: area was invalidated because width changed`}
+      />
+    </section>
+
+    <section id="inspect">
+      <h2>Inspecting Nodes</h2>
+      <p>Use <code>inspect()</code> to see a node's current state, dirty flag, and connection count.</p>
+
+      <CodeBlock 
+        filename="debug-inspect.ts"
+        lang="typescript"
+        code={`const info = area.inspect()
+// {
+//   id: 'node_3',
+//   name: 'area',
+//   type: 'computed',
+//   value: 600000,
+//   dirty: false,
+//   dependencyCount: 2,
+//   dependentCount: 0
+// }`}
+      />
+    </section>
+
+    <section id="todot">
+      <h2>Visualizing with toDot()</h2>
+      <p>Export your graph as Graphviz DOT format and visualize it online.</p>
+
+      <CodeBlock 
+        filename="debug-dot.ts"
+        lang="typescript"
+        code={`import { input, node, toDot } from '@blu3ph4ntom/inval'
+
+const a = input(1)
+const b = input(2)
+const c = node({ dependsOn: { a, b }, compute: ({ a, b }) => a + b })
+
+console.log(toDot([c]))
+// digraph G {
+//   "a" -> "c"
+//   "b" -> "c"
+// }
+
+// Paste output into graphviz.online to see the graph visually`}
+      />
+    </section>
+
+    <section id="stats">
+      <h2>Monitoring with stats()</h2>
+      <p>Track graph size and compute calls to monitor performance.</p>
+
+      <CodeBlock 
+        filename="debug-stats.ts"
+        lang="typescript"
+        code={`import { stats } from '@blu3ph4ntom/inval'
+
+const s = stats([root])
+// {
+//   nodeCount: 15,
+//   inputCount: 5,
+//   computedCount: 10,
+//   edgeCount: 20,
+//   totalComputeCalls: 42
+// }`}
+      />
+
+      <Callout type="tip">
+        <p>Call <code>stats()</code> before and after operations to measure how many computations were triggered. A well-designed graph minimizes <code>totalComputeCalls</code>.</p>
+      </Callout>
+    </section>
+
+    <div class="page-nav">
+      <a href="/docs/guides/react-integration" class="page-nav-prev">
+        <span>←</span>
+        <span>React Integration</span>
+      </a>
+      <a href="/docs/examples/" class="page-nav-next">
+        <span>Examples</span>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .docs-page { padding: 48px 64px; max-width: 800px; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .breadcrumb a { color: var(--text-secondary); }
+  .breadcrumb span:last-child { color: var(--text-primary); }
+  h1 { font-family: var(--font-display); font-size: 40px; font-weight: 700; margin-bottom: 12px; }
+  .lead { font-size: 18px; color: var(--text-secondary); margin-bottom: 48px; }
+  h2 { font-family: var(--font-display); font-size: 28px; font-weight: 600; margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  p { color: var(--text-secondary); font-size: 15px; line-height: 1.7; margin-bottom: 16px; }
+  code { font-family: var(--font-mono); font-size: 0.9em; background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+  .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .page-nav-prev, .page-nav-next { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); transition: all 0.2s ease; }
+  .page-nav-prev:hover, .page-nav-next:hover { border-color: var(--accent); color: var(--text-primary); text-decoration: none; }
+  @media (max-width: 1024px) { .docs-page { padding: 32px 24px; } }
+</style>

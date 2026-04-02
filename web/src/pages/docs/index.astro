@@ -1,0 +1,309 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro'
+import DocsSidebar from '../../components/docs/DocsSidebar.astro'
+import CodeBlock from '../../components/docs/CodeBlock.astro'
+import Callout from '../../components/docs/Callout.astro'
+
+const currentPage = '/docs/'
+---
+
+<DocsLayout title="Introduction — Inval Docs" description="Learn what Inval is and why you need it.">
+  <DocsSidebar slot="sidebar" currentPage={currentPage} />
+
+  <div class="docs-page">
+    <nav class="breadcrumb">
+      <a href="/docs/">Docs</a>
+      <span>/</span>
+      <span>Introduction</span>
+    </nav>
+
+    <h1>Introduction</h1>
+    <p class="lead">Deterministic, incremental layout invalidation engine.</p>
+
+    <section id="what-is-inval">
+      <h2>What is Inval?</h2>
+      <p>Inval is a <strong>dependency graph engine</strong> for tracking computed values. It's not a framework, not a renderer, and not a state management library.</p>
+      <p>It answers one question: <em>"What geometry changed, and what depends on it?"</em></p>
+      <p>When you build interactive UIs — dashboards, virtualized lists, resizable panels — layout changes cascade. A sidebar width change affects content width, which changes text wrapping, which shifts card heights, which breaks scroll positions.</p>
+      <p>Most apps handle this by recomputing everything on every change. Inval gives you the primitive to do it <strong>incrementally</strong>.</p>
+    </section>
+
+    <section id="why-inval">
+      <h2>Why Inval?</h2>
+      <p>Popular virtualization libraries struggle with dynamic height issues:</p>
+      <ul>
+        <li><strong>TanStack Virtual</strong> — issues #832, #659: scrolling with dynamic height lags and stutters</li>
+        <li><strong>react-window</strong> — issue #741: VariableSizeList causes major scroll jitters</li>
+      </ul>
+      <p><strong>Root cause:</strong> No dependency graph means recomputing ALL nodes on ANY change.</p>
+
+      <Callout type="tip">
+        <p>Inval solves this at the engine level. Declare what depends on what, and the engine handles incremental updates automatically.</p>
+      </Callout>
+    </section>
+
+    <section id="quick-example">
+      <h2>Quick Example</h2>
+
+      <CodeBlock 
+        filename="example.ts"
+        lang="typescript"
+        code={`import { input, node, why } from '@blu3ph4ntom/inval'
+
+// Declare inputs
+const width = input(800)
+const height = input(600)
+
+// Computed node with dependencies
+const area = node({
+  dependsOn: { w: width, h: height },
+  compute: ({ w, h }) => w * h
+})
+
+area.get()        // 480000 — computes lazily
+area.get()        // 480000 — cached, zero cost
+
+width.set(1000)
+area.get()        // 600000 — recomputes only what changed
+
+why(area)         // ['area', 'width'] — trace invalidation path`}
+      />
+    </section>
+
+    <section id="key-principles">
+      <h2>Key Principles</h2>
+      <div class="principles-grid">
+        <div class="principle-card">
+          <h3>DAG</h3>
+          <p>Nodes form a directed acyclic graph. Cycles are detected at construction time.</p>
+        </div>
+        <div class="principle-card">
+          <h3>Lazy</h3>
+          <p><code>node.get()</code> recomputes only if dirty. Returns cached value otherwise.</p>
+        </div>
+        <div class="principle-card">
+          <h3>Incremental</h3>
+          <p><code>input.set()</code> walks children, marks only affected nodes dirty.</p>
+        </div>
+        <div class="principle-card">
+          <h3>Pure</h3>
+          <p>No DOM. You measure, you pass values in. Framework agnostic.</p>
+        </div>
+        <div class="principle-card">
+          <h3>Zero deps</h3>
+          <p>Pure TypeScript. 12KB packed. No external runtime dependencies.</p>
+        </div>
+        <div class="principle-card">
+          <h3>Debuggable</h3>
+          <p><code>why()</code>, <code>inspect()</code>, <code>toDot()</code> for full visibility.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="next-steps">
+      <h2>Next Steps</h2>
+      <div class="next-steps">
+        <a href="/docs/getting-started" class="next-step-card">
+          <span class="next-step-label">Next</span>
+          <h3>Getting Started →</h3>
+          <p>Install Inval and build your first dependency graph in 5 minutes.</p>
+        </a>
+      </div>
+    </section>
+
+    <div class="page-nav">
+      <div></div>
+      <a href="/docs/getting-started" class="page-nav-next">
+        <span>Getting Started</span>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .docs-page {
+    padding: 48px 64px;
+    max-width: 800px;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .breadcrumb a {
+    color: var(--text-secondary);
+  }
+
+  .breadcrumb span:last-child {
+    color: var(--text-primary);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .lead {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  ul {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    padding-left: 24px;
+  }
+
+  ul li {
+    margin-bottom: 8px;
+  }
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .principle-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.2s ease;
+  }
+
+  .principle-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.1);
+  }
+
+  .principle-card h3 {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .principle-card p {
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+
+  .next-steps {
+    margin: 32px 0;
+  }
+
+  .next-step-card {
+    display: block;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: all 0.2s ease;
+  }
+
+  .next-step-card:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+
+  .next-step-label {
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .next-step-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 4px 0 8px;
+  }
+
+  .next-step-card p {
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-nav-next {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+
+  .page-nav-next:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  @media (max-width: 1024px) {
+    .docs-page {
+      padding: 32px 24px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .principles-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

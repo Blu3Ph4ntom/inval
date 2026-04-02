@@ -1,0 +1,133 @@
+---
+---
+
+<section class="section use-cases-section" id="use-cases">
+  <div class="container">
+    <div class="section-header fade-in">
+      <span class="section-tag">// Use Cases</span>
+      <h2 class="section-title">Where Inval shines.<br /><span class="text-muted">Real-world applications.</span></h2>
+    </div>
+    
+    <div class="use-cases-grid stagger" x-data="{ active: null }">
+      <template x-for="useCase in [
+        { name: 'Virtualized Lists', desc: 'Variable-height rows with O(1) scroll updates. Only visible range recomputes.', icon: '📋' },
+        { name: 'Dashboards', desc: 'Resizable panels with dependent widgets. Change one width, cascade intelligently.', icon: '📊' },
+        { name: 'Kanban Boards', desc: 'Column widths, card heights, scroll positions — all tracked as a dependency graph.', icon: '📌' },
+        { name: 'Data Grids', desc: 'Column resizing, row virtualization, and dynamic cell heights without jank.', icon: '📈' },
+        { name: 'Chat UIs', desc: 'Message bubbles with dynamic heights. Scroll position preserved on new messages.', icon: '💬' },
+        { name: 'Whiteboards', desc: 'Canvas elements with positional dependencies. Zoom and pan without full redraw.', icon: '🎨' },
+        { name: 'Node Editors', desc: 'Connected nodes with computed positions. Drag one, update dependents incrementally.', icon: '🔗' },
+        { name: 'Timeline Editors', desc: 'Track items with dynamic widths. Scrubbing updates only visible viewport.', icon: '🎬' },
+        { name: 'Responsive Grids', desc: 'Breakpoint-driven layouts. Recompute only affected elements on resize.', icon: '📱' }
+      ]" :key="useCase.name">
+        <div class="use-case-card" :class="{ active: active === useCase.name }" @click="active = active === useCase.name ? null : useCase.name">
+          <div class="use-case-header">
+            <span class="use-case-icon" x-text="useCase.icon"></span>
+            <span class="use-case-name" x-text="useCase.name"></span>
+            <span class="use-case-arrow">→</span>
+          </div>
+          <div class="use-case-desc" x-show="active === useCase.name" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-text="useCase.desc"></div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+<style>
+  .use-cases-section {
+    padding: var(--space-4xl) 0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .section-tag {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  .use-cases-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+
+  .use-case-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--rounded-lg);
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+  }
+
+  .use-case-card:hover {
+    border-color: var(--border-hover);
+  }
+
+  .use-case-card.active {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .use-case-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .use-case-icon {
+    font-size: 20px;
+  }
+
+  .use-case-name {
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .use-case-arrow {
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: transform var(--transition-fast);
+  }
+
+  .use-case-card.active .use-case-arrow {
+    transform: rotate(90deg);
+  }
+
+  .use-case-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border);
+    margin-top: var(--space-md);
+  }
+
+  @media (max-width: 1024px) {
+    .use-cases-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .use-cases-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

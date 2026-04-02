@@ -1,0 +1,84 @@
+---
+export interface Props {
+  code: string
+  filename?: string
+  lang?: string
+}
+
+const { code, filename, lang = 'typescript' } = Astro.props
+---
+
+<div class="code-block" x-data="{ copied: false }">
+  {(filename || lang) && (
+    <div class="code-header">
+      {filename && <span class="code-filename">{filename}</span>}
+      {lang && <span class="code-lang">{lang}</span>}
+      <button class="copy-btn" @click="navigator.clipboard.writeText(code); copied = true; setTimeout(() => copied = false, 2000)">
+        <span x-show="!copied">Copy</span>
+        <span x-show="copied">Copied!</span>
+      </button>
+    </div>
+  )}
+  <pre><code>{code}</code></pre>
+</div>
+
+<style>
+  .code-block {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin: var(--space-lg) 0;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-tertiary);
+  }
+
+  .code-filename {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .code-lang {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: var(--font-sans);
+  }
+
+  .copy-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .code-block pre {
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .code-block code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+</style>

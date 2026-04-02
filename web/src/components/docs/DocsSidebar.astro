@@ -1,0 +1,226 @@
+---
+export interface Props {
+  currentPage: string
+}
+
+const { currentPage } = Astro.props
+
+interface NavItem {
+  label: string
+  href: string
+}
+
+interface NavSection {
+  title: string
+  items: NavItem[]
+}
+
+const sections: NavSection[] = [
+  {
+    title: 'Getting Started',
+    items: [
+      { label: 'Introduction', href: '/docs/' },
+      { label: 'Installation', href: '/docs/getting-started#installation' },
+      { label: 'Quick Start', href: '/docs/getting-started#quick-start' },
+    ]
+  },
+  {
+    title: 'Core Concepts',
+    items: [
+      { label: 'Dependency Graphs', href: '/docs/core-concepts#dependency-graphs' },
+      { label: 'Input Nodes', href: '/docs/core-concepts#input-nodes' },
+      { label: 'Computed Nodes', href: '/docs/core-concepts#computed-nodes' },
+      { label: 'Caching & Dirty State', href: '/docs/core-concepts#caching' },
+      { label: 'Batch Updates', href: '/docs/core-concepts#batch' },
+      { label: 'Lifecycle', href: '/docs/core-concepts#lifecycle' },
+    ]
+  },
+  {
+    title: 'API Reference',
+    items: [
+      { label: 'input()', href: '/docs/api-reference#input' },
+      { label: 'node()', href: '/docs/api-reference#node' },
+      { label: 'batch()', href: '/docs/api-reference#batch' },
+      { label: 'why()', href: '/docs/api-reference#why' },
+      { label: 'ancestors() / descendants()', href: '/docs/api-reference#ancestors-descendants' },
+      { label: 'toDot()', href: '/docs/api-reference#todot' },
+      { label: 'stats()', href: '/docs/api-reference#stats' },
+      { label: 'TypeScript Types', href: '/docs/api-reference#types' },
+    ]
+  },
+  {
+    title: 'Guides',
+    items: [
+      { label: 'Virtualized Lists', href: '/docs/guides/virtualized-lists' },
+      { label: 'Dashboards', href: '/docs/guides/dashboards' },
+      { label: 'React Integration', href: '/docs/guides/react-integration' },
+      { label: 'Debugging', href: '/docs/guides/debugging' },
+    ]
+  },
+  {
+    title: 'Examples',
+    items: [
+      { label: 'Overview', href: '/docs/examples/' },
+      { label: 'Basic Calculator', href: '/docs/examples/#calculator' },
+      { label: 'Variable-Height List', href: '/docs/examples/#list' },
+      { label: 'Dashboard', href: '/docs/examples/#dashboard' },
+    ]
+  },
+]
+
+function isActive(href: string, current: string): boolean {
+  if (href === current) return true
+  if (href !== '/' && current.startsWith(href)) return true
+  return false
+}
+---
+
+<nav class="docs-nav" x-data="{ openSections: {} }">
+  <a href="/" class="docs-nav-logo">
+    <span class="logo-text">inval</span>
+    <span class="logo-version">v0.1.1</span>
+  </a>
+
+  <div class="docs-nav-search">
+    <input type="text" placeholder="Search docs..." x-ref="searchInput" @input.debounce.300ms="$dispatch('docs-search', $event.target.value)" />
+  </div>
+
+  {sections.map((section) => {
+    const defaultOpen = section.items.some(item => isActive(item.href, currentPage))
+    return (
+      <div class="nav-section" x-data={{ open: defaultOpen }}>
+        <button class="nav-section-toggle" @click="open = !open" aria-expanded={defaultOpen}>
+          <span>{section.title}</span>
+          <span class="nav-chevron" :class="{ open }">›</span>
+        </button>
+        <ul class="nav-items" x-show="open">
+          {section.items.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:active={isActive(item.href, currentPage)}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  })}
+</nav>
+
+<style>
+  .docs-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .docs-nav-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-text {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .logo-version {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-tertiary);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+  }
+
+  .docs-nav-search {
+    margin-bottom: var(--space-md);
+  }
+
+  .docs-nav-search input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .docs-nav-search input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .docs-nav-search input:focus {
+    border-color: var(--accent);
+  }
+
+  .nav-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-section-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    padding: var(--space-sm) 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .nav-chevron {
+    display: inline-block;
+    transition: transform var(--transition-fast);
+    color: var(--text-muted);
+  }
+
+  .nav-chevron.open {
+    transform: rotate(90deg);
+  }
+
+  .nav-items {
+    list-style: none;
+    padding-left: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-items a {
+    display: block;
+    padding: 4px 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+
+  .nav-items a:hover {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    text-decoration: none;
+  }
+
+  .nav-items a.active {
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+</style>

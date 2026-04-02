@@ -1,0 +1,111 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">inval</a>
+        <p class="footer-desc">Deterministic, incremental layout invalidation engine.</p>
+      </div>
+      
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#benchmarks">Benchmarks</a>
+          <a href="/docs">Documentation</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.npmjs.com/package/@blu3ph4ntom/inval" target="_blank" rel="noopener">npm</a>
+          <a href="https://github.com/Blu3Ph4ntom/inval/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+        </div>
+        <div class="footer-col">
+          <h4>Project</h4>
+          <a href="https://github.com/Blu3Ph4ntom/inval/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a>
+          <a href="https://github.com/Blu3Ph4ntom/inval/blob/main/LICENSE" target="_blank" rel="noopener">License (MIT)</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <span>Built by <a href="https://github.com/Blu3Ph4ntom" target="_blank" rel="noopener">Blu3Ph4ntom</a></span>
+      <span>MIT License — free for commercial use</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding: var(--space-3xl) 0 var(--space-xl);
+    border-top: 1px solid var(--border);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-3xl);
+    margin-bottom: var(--space-2xl);
+  }
+  .footer-logo {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .footer-desc {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: var(--space-sm);
+  }
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+  .footer-col h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-md);
+  }
+  .footer-col a {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 14px;
+    padding: var(--space-xs) 0;
+  }
+  .footer-col a:hover {
+    color: var(--text-primary);
+  }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+  }
+  .footer-bottom span {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .footer-bottom a {
+    color: var(--text-secondary);
+  }
+  .footer-bottom a:hover {
+    color: var(--text-primary);
+  }
+  @media (max-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+    .footer-links {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .footer-bottom {
+      flex-direction: column;
+      gap: var(--space-sm);
+      text-align: center;
+    }
+  }
+</style>

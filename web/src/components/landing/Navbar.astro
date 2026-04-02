@@ -1,0 +1,149 @@
+<header class="navbar" x-data="{ mobileOpen: false }">
+  <div class="navbar-inner">
+    <a href="/" class="navbar-logo">inval</a>
+
+    <nav class="navbar-links" :class="{ open: mobileOpen }">
+      <a href="#features">Features</a>
+      <a href="#demo">Demo</a>
+      <a href="/docs">Docs</a>
+      <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener">GitHub</a>
+      <a href="/docs" class="btn-primary">Get Started</a>
+    </nav>
+
+    <button class="mobile-toggle" @click="mobileOpen = !mobileOpen" aria-label="Toggle menu">
+      <span :class="{ open: mobileOpen }"></span>
+      <span :class="{ open: mobileOpen }"></span>
+      <span :class="{ open: mobileOpen }"></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(9, 9, 11, 0.8);
+    border-bottom: 1px solid var(--border);
+    height: 64px;
+  }
+
+  .navbar-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .navbar-logo {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  }
+
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .navbar-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+  }
+
+  .navbar-links a:hover {
+    color: var(--text-primary);
+  }
+
+  .navbar-links .btn-primary {
+    background: var(--accent);
+    color: var(--bg-primary);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .navbar-links .btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-glow);
+    color: var(--bg-primary);
+  }
+
+  .mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .mobile-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+  }
+
+  .mobile-toggle span.open:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .mobile-toggle span.open:nth-child(2) {
+    opacity: 0;
+  }
+
+  .mobile-toggle span.open:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  @media (max-width: 768px) {
+    .mobile-toggle {
+      display: flex;
+    }
+
+    .navbar-links {
+      position: absolute;
+      top: 64px;
+      left: 0;
+      right: 0;
+      background: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      flex-direction: column;
+      padding: var(--space-6) var(--space-4);
+      gap: var(--space-4);
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform var(--transition-base), opacity var(--transition-base);
+    }
+
+    .navbar-links.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .navbar-links a {
+      font-size: 16px;
+    }
+  }
+</style>
