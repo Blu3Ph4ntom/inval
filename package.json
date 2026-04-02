@@ -17,7 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --format esm,cjs --target node && bun run build:types",
+    "build": "bun build src/index.ts --outdir dist --format esm --target node && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node && bun run build:types",
     "build:types": "tsc --emitDeclarationOnly --outDir dist",
     "test": "bun test",
     "bench": "bun run bench/index.ts",
