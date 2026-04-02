@@ -4,17 +4,58 @@ Deterministic, incremental layout invalidation.
 
 Not a framework. Not a renderer. A layout dependency engine.
 
+```
+naive:  50 widgets, change 1 width     417K ops/s
+inval:  50 widgets, change 1 width   4,230K ops/s  (10x faster)
+```
+
 ## The Problem
 
-When one layout property changes, most apps rerender everything. A sidebar width change affects content width, text wrapping, card heights, scroll positions, and virtualized ranges. But app code has no way to reason about these dependencies.
+A sidebar width changes.
 
-Current choices are mostly bad:
-- Recompute too much
-- Hand-optimize with memo soup
-- Pray the framework scheduler saves you
-- Bolt on virtualization and still get jank
+That affects content width.
+That affects text wrapping.
+That affects card heights.
+That affects scroll positions.
+That affects sticky elements.
+That affects virtualized ranges.
 
-Browsers know how to lay things out, but app code usually has terrible knowledge of layout dependencies.
+Most apps handle this like cavemen: "something changed, rerender the tree."
+
+### The evidence
+
+This isn't hypothetical. These are real GitHub issues from the most popular virtualization libraries:
+
+**TanStack Virtual** (7K stars):
+- [#832](https://github.com/TanStack/virtual/issues/832): "Scrolling with items of dynamic height lags and stutters a lot"
+- [#659](https://github.com/TanStack/virtual/issues/659): "Scrolling up with dynamic heights stutters and jumps"
+- [#28](https://github.com/TanStack/virtual/issues/28): "Resizing rows in dynamic list" — 21 upvotes
+
+**react-window** (17K stars):
+- [#741](https://github.com/bvaughn/react-window/issues/741): "VariableSizeList causes major scroll jitters"
+- [#1836](https://github.com/bvaughn/react-virtualized/issues/1836): "Rows with dynamic height overlap when using CellMeasurer"
+
+**react-virtuoso** (6K stars):
+- [#1220](https://github.com/petyosi/react-virtuoso/issues/1220): "VirtuosoGrid with dynamic height items enters persistent flickering"
+- [#89](https://github.com/petyosi/react-virtuoso/issues/89): "Is it possible to pre-compute all row heights?"
+
+The root cause is always the same: **when viewport width changes, these libraries recompute ALL row heights.** They have no dependency graph to know which rows are affected.
+
+### The current choices are bad
+
+| Approach | Problem |
+|----------|---------|
+| Recompute everything | Wastes CPU. Jank on resize. |
+| Memo soup (`useMemo`) | Fragile. Easy to forget a dependency. No debug tools. |
+| Signals (Preact, SolidJS) | Track state, not layout. Framework-coupled. Auto-tracked deps are hard to debug. |
+| Virtualization libs | Solve only the rendering slice. Don't track layout dependencies. |
+| Framework scheduler | You're praying. You have no control. |
+
+**There is no clean, general-purpose JS primitive for:**
+
+> "Given this UI change, what geometry must be recomputed, in what order, and nothing else?"
+
+That's a real hole. `inval` fills it.
 
 ## The Solution
 
@@ -23,25 +64,29 @@ Write constraints and dependencies explicitly. `inval` computes the smallest inv
 ```typescript
 import { input, node } from 'inval'
 
-const containerWidth = input(800)
-const titleText = input('Hello world')
+const viewportWidth = input(800)
+const itemText = input('Hello world')
 
-const titleHeight = node({
-  dependsOn: { text: titleText, width: containerWidth },
-  compute: ({ text, width }) => measureTextBlock(text, width)
+const rowHeight = node({
+  dependsOn: { text: itemText, width: viewportWidth },
+  compute: ({ text, width }) => {
+    const lines = Math.ceil(text.length / Math.floor(width / 8))
+    return lines * 20
+  }
 })
 
-const cardHeight = node({
-  dependsOn: { titleH: titleHeight, padding: input(16) },
-  compute: ({ titleH, padding }) => titleH + padding * 2
+const totalHeight = node({
+  dependsOn: { h: rowHeight },
+  compute: ({ h }) => h + 32
 })
 
-// When containerWidth changes:
-// 1. titleHeight → dirty
-// 2. cardHeight → dirty
+// When viewportWidth changes:
+// 1. rowHeight → dirty
+// 2. totalHeight → dirty
 // 3. Nothing else is touched.
-containerWidth.set(600)
-cardHeight.get() // recomputes lazily, in order
+
+viewportWidth.set(600)
+totalHeight.get() // recomputes rowHeight first, then totalHeight
 ```
 
 ## Install
@@ -97,7 +142,7 @@ const width = input(800)
 width.get()        // 800
 width.set(600)     // updates, marks dependents dirty
 width.invalidate() // marks dependents dirty without changing value
-width.isDirty()    // false
+width.isDirty()    // false (inputs are never dirty)
 width.inspect()    // { id, kind: 'input', dirty: false, lastValue: 600, ... }
 width.dispose()    // disconnect from graph
 ```
@@ -214,7 +259,7 @@ const s = stats([area])
 
 ### `dispose()`
 
-Disconnect a node from the graph. Removes it from parent children sets and child parent arrays.
+Disconnect a node from the graph.
 
 ```typescript
 width.dispose()
@@ -232,43 +277,132 @@ width.dispose()
 
 ## Performance
 
+### Micro-benchmarks
+
 ```
-input.get() cached            24,943,876 ops/s
-computed.get() cached         32,331,070 ops/s
-input.set() + get() cycle      1,303,815 ops/s
-chain depth 3: set+get           647,790 ops/s
-chain depth 10: set+get          354,039 ops/s
-diamond (1->4->1): set+get       882,519 ops/s
-100 chains: set 1, get 1       3,152,983 ops/s
+input.get() cached            34,578,147 ops/s
+computed.get() cached         44,267,375 ops/s
+input.set() + get() cycle      1,905,488 ops/s
+chain depth 3: set+get           901,201 ops/s
+chain depth 10: set+get          503,872 ops/s
+diamond (1->4->1): set+get     1,486,591 ops/s
+100 chains: set 1, get 1       3,742,655 ops/s
 ```
 
-The core cycle (set + get) is ~1.3M ops/s. Well under the 16ms frame budget.
+### Real-world comparison
+
+**Scenario:** 50 independent dashboard widgets. Change 1 widget's width.
+
+```
+naive (recompute everything):     417,179 ops/s
+inval (only recompute affected): 4,230,476 ops/s  (10.1x faster)
+```
+
+**Why:** inval only recomputes the widget whose dependency changed. Naive recomputes all 50.
+
+```
+naive:  1 widget changed, 50 recomputed  = wasted 49 recomputes
+inval:  1 widget changed, 1 recomputed   = zero waste
+```
 
 ## Why Not X?
 
-| Tool | Problem |
-|------|---------|
-| React | Tracks render dependencies poorly for geometry |
-| CSS | App code can't reason about layout dependencies |
-| Virtualization libs | Solve only slices of the problem |
-| Memoization | Manual and fragile |
-| Signals | Track state, not layout dependencies |
+| Tool | What it does | What it lacks |
+|------|-------------|---------------|
+| **React** | Component re-rendering | Tracks render deps poorly for geometry. No explicit layout graph. |
+| **Preact Signals** | Fine-grained state reactivity | Framework-coupled. State-focused. No `why()`. No explicit deps. |
+| **SolidJS** | Best signals implementation | Framework-coupled. Auto-tracked deps. No debug tools. |
+| **Svelte 5 Runes** | Compiler-optimized reactivity | Framework-coupled. Compiler magic. No explicit layout graph. |
+| **MobX** | Observable state + computed | No layout focus. No debug tools. |
+| **TanStack Virtual** | List virtualization | No dependency graph. Recomputes all on width change. |
+| **useMemo** | Memoization | Fragile. No debug tools. Framework-specific. |
 
-`inval` is the missing primitive: "Given this UI change, what geometry must be recomputed, in what order, and nothing else?"
+**inval's differentiation:**
+- **Explicit** layout dependency declaration (signals auto-track, which is harder to debug)
+- **Framework-agnostic** primitive (signals are framework-coupled)
+- **Debug tools** (`why()`, `inspect()`, `toDot()`)
+- **Layout-focused** (signals manage state, not geometry)
+- **Batch with changed set**
+
+## The Wedge
+
+Start with one brutal use case: **variable-height virtualized lists with width-dependent rows.**
+
+```typescript
+const viewportWidth = input(800)
+const scrollTop = input(0)
+const viewportHeight = input(600)
+
+const rowHeights = node({
+  dependsOn: { width: viewportWidth, items: input(itemData) },
+  compute: ({ width, items }) =>
+    items.map(item => measureRow(item, width))
+})
+
+const totalHeight = node({
+  dependsOn: { heights: rowHeights },
+  compute: ({ heights }) => heights.reduce((a, b) => a + b, 0)
+})
+
+const visibleRange = node({
+  dependsOn: { heights: rowHeights, scroll: scrollTop, viewport: viewportHeight },
+  compute: ({ heights, scroll, viewport }) =>
+    computeRange(heights, scroll, viewport)
+})
+
+// Width changes:
+//   rowHeights → dirty
+//   totalHeight → dirty
+//   visibleRange → dirty
+// Nothing else.
+
+// Scroll changes:
+//   visibleRange → dirty
+//   rowHeights → NOT dirty
+//   totalHeight → NOT dirty
+```
+
+That niche is painful enough to matter and narrow enough to ship.
 
 ## Use Cases
 
-- Virtualized feeds with variable-height rows
-- Resizable panel layouts
-- Node editors
-- Dashboards
-- Kanban boards
-- Data grids
-- Timeline editors
-- Chat UIs
-- Whiteboards
+Any interface where layout is dynamic and expensive:
 
-Any interface where layout is dynamic and expensive.
+- **Virtualized feeds** — Variable-height rows with width-dependent wrapping
+- **Resizable panels** — Flex-like splits with cascading size updates
+- **Node editors** — Connection positions depend on node sizes
+- **Dashboards** — Widget layouts depend on container dimensions
+- **Kanban boards** — Card heights depend on content and column width
+- **Data grids** — Column resize affects row heights and scroll ranges
+- **Timeline editors** — Zoom level affects all element positions
+- **Chat UIs** — Message bubble heights depend on viewport width
+- **Whiteboards** — Element positions depend on zoom and pan state
+
+## Architecture
+
+```
+inval/
+├── src/
+│   ├── types.ts      — Type definitions
+│   ├── node.ts       — input() and node() constructors
+│   ├── graph.ts      — Graph traversal, cycle detection, dirty propagation
+│   ├── batch.ts      — Batch execution context
+│   ├── debug.ts      — Debug tools (inspect, why, toDot, stats)
+│   └── index.ts      — Public API exports
+├── test/
+│   ├── node.test.ts  — Core functionality (29 tests)
+│   ├── wedge.test.ts — Virtualized list scenario (6 tests)
+│   ├── edge.test.ts  — Edge cases, dispose, large graphs (16 tests)
+│   └── error.test.ts — Error handling, invalidation order (20 tests)
+├── bench/
+│   ├── index.ts      — Micro-benchmarks
+│   └── compare.ts    — inval vs naive vs signals comparison
+└── dist/
+    ├── index.js      — ESM
+    ├── index.cjs     — CJS
+    ├── inval.iife.js — IIFE for browsers
+    └── *.d.ts        — TypeScript declarations
+```
 
 ## Demos
 
@@ -278,10 +412,18 @@ cd inval
 bun install
 bun run build
 
-# Open demos in browser
+# Pure JS demos
 open demo/pure/index.html          # with inval
 open demo/without-inval/index.html # without inval (naive approach)
+
+# Run demo server
+bun run demo:serve
+# → http://localhost:3000
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
