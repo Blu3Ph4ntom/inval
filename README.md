@@ -7,6 +7,8 @@ Not a framework. Not a renderer. The missing primitive for layout-aware applicat
 ```
 naive:  50 widgets, change 1 width     417K ops/s
 inval:  50 widgets, change 1 width   4,230K ops/s  (10x faster)
+
+![Dashboard Demo](docs/dashboard-demo.gif)
 ```
 
 ---
@@ -56,24 +58,26 @@ pnpm add @blu3ph4ntom/inval
 ### Before (Naive Approach)
 
 ```typescript
-// Every width change recomputes EVERYTHING
-const width = 800
-const contentWidth = width - sidebar
-const cardHeight = textHeight(contentWidth, cardText)
-const rowOffset = index * cardHeight
-const visibleRange = computeVisible(scroll, rowOffset)
-// 50 widgets × 6 computations each = 300 recomputes
+// Without a dependency graph, you must recompute everything
+// or manually track what depends on what
+function updateLayout(newWidth) {
+  const contentWidth = newWidth - sidebarWidth
+  const cardHeight = textHeight(contentWidth, cardText)
+  const rowOffset = index * cardHeight
+  const visibleRange = computeVisible(scrollTop, rowOffset)
+  // Either recompute all of these, or try to memoize each one
+}
 ```
 
 ### After (With Inval)
 
 ```typescript
-import { input, node, batch, why } from '@blu3ph4ntom/inval'
+import { input, node } from '@blu3ph4ntom/inval'
 
 const width = input(800)
 const contentWidth = node({
   dependsOn: { w: width },
-  compute: ({ w }) => w - sidebar
+  compute: ({ w }) => w - sidebarWidth
 })
 const cardHeight = node({
   dependsOn: { cw: contentWidth },
@@ -82,14 +86,14 @@ const cardHeight = node({
 
 width.set(600)
 // Only contentWidth and cardHeight recompute
-// visibleRange? NOT dirty — it doesn't depend on width
-// 5 widgets × 2 computations = 10 recomputes (30x less)
+// visibleRange stays clean if it doesn't depend on width
+// The library handles incremental updates automatically
 ```
 
 **You get:**
-- 10x faster performance on layout changes
+- 10x faster performance on layout changes (benchmarked)
 - Exact knowledge of what recomputed (via `why()`)
-- Confidence your reflows are minimal and correct
+- No more manual memoization guessing
 
 ---
 
@@ -122,11 +126,13 @@ why(area)         // ['area', 'width'] — trace exact invalidation path
 ### Dashboard: 50 Widgets, One Width Change
 
 ```
-naive:  417,000 ops/s  (recomputes all 50 × 6 = 300 computations)
-inval:  4,230,000 ops/s  (recomputes only 10 computations)
+naive:  417,000 ops/s  (recomputes all computed nodes)
+inval:  4,230,000 ops/s  (recomputes only affected nodes)
 ─────────────────────────────────────────────────────────────
 10.1x faster in production-like scenario
 ```
+
+Note: The naive comparison uses direct function calls without any optimization (no memoization, no dependency tracking). Your actual results will vary based on implementation.
 
 ### Virtualized List: 1000 Items, Width Change
 
