@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none">
+  <!--
+    Precision-engineered wordmark for "Inval"
+    Recreating the specific geometric sans-serif from the reference:
+    - Uppercase 'I' with specific stroke weight
+    - Characteristic lowercase 'n' with tight shoulder
+    - Geometric 'v' and 'a'
+    - Full height 'l'
+  -->
+  <g fill="white">
+    <!-- I -->
+    <path d="M10 18H24V70H10V18Z" />
+    <!-- n -->
+    <path d="M36 34H48.5V38.5C51 35.5 55 33.5 60 33.5C68.5 33.5 73.5 39.5 73.5 49V70H61V49.5C61 45 58.5 43.5 54.5 43.5C50.5 43.5 48.5 45.5 48.5 49.5V70H36V34Z" />
+    <!-- v -->
+    <path d="M84 34H96.5L106.5 58L116.5 34H129L113 70H100L84 34Z" />
+    <!-- a -->
+    <path d="M158 34H170V70H158V66.5C155.5 69 152 71 147 71C139.5 71 133 65.5 133 55C133 44.5 139.5 39 147 39C152 39 155.5 41 158 43.5V34ZM151.5 61.5C156 61.5 159 58.5 159 54.5C159 50.5 156 47.5 151.5 47.5C147 47.5 144 50.5 144 54.5C144 58.5 147 61.5 151.5 61.5Z" />
+    <!-- l -->
+    <path d="M182 18H196V70H182V18Z" />
+  </g>
+</svg>
