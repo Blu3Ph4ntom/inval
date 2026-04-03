@@ -128,9 +128,15 @@ const codeId = `code-${Math.random().toString(36).slice(2, 9)}`;
   }
 
   .code-block pre {
+    display: contents;
     margin: 0 !important;
-    padding: 1.5rem 0 !important;
+    padding: 0 !important;
     background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: 100%;
     font-size: 13.5px !important;
     line-height: 1.7 !important;
     overflow-x: auto;
@@ -139,6 +145,7 @@ const codeId = `code-${Math.random().toString(36).slice(2, 9)}`;
   .code-block code {
     display: grid;
     counter-reset: line;
+    padding: 1.5rem 0;
   }
 
   .code-block .line {
