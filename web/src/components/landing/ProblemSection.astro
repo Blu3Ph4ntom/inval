@@ -1,165 +1,160 @@
-<section class="section problem-section" id="problem">
-  <div class="container">
-    <div class="section-header fade-in">
-      <span class="section-tag">// The Problem</span>
-      <h2 class="section-title">Every resize. Every scroll.<br /><span class="text-muted">Recomputing everything.</span></h2>
-    </div>
-    
-    <div class="problem-grid stagger">
-      <div class="problem-card">
-        <div class="problem-icon">&#9889;</div>
-        <h3>Dashboard lag on resize</h3>
-        <p>Resize a sidebar, watch the entire dashboard stutter. Every component recalculates.</p>
+<section class="sect" id="problem">
+  <div class="wrap">
+
+    <p class="sect-eyebrow" data-reveal>The Problem</p>
+    <h2 class="sect-heading" data-reveal>Every change triggers<br />a full recompute.</h2>
+    <p class="sect-body" data-reveal>
+      Sidebar resizes, dynamic-height rows, responsive breakpoints — applications have no
+      abstraction for <em>what geometry changed, and what depends on it</em>.
+    </p>
+
+    <div class="symptoms" data-stagger>
+      <div class="symptom">
+        <p class="symptom-name">Dashboard lag</p>
+        <p class="symptom-desc">Resize one panel. Every widget repaints. No dependency tracking means no optimisation.</p>
       </div>
-      
-      <div class="problem-card">
-        <div class="problem-icon">&#128228;</div>
-        <h3>Virtualized list jitter</h3>
-        <p>Scroll position jumps when dynamic-height rows load. Users see flickering content.</p>
+      <div class="symptom">
+        <p class="symptom-name">Scroll jitter</p>
+        <p class="symptom-desc">Dynamic-height rows don't know their own dependencies. Total height recalculates on every scroll event.</p>
       </div>
-      
-      <div class="problem-card">
-        <div class="problem-icon">&#128208;</div>
-        <h3>Responsive layout cost</h3>
-        <p>Every breakpoint requires careful memoization. Miss one dependency and it's stale.</p>
+      <div class="symptom">
+        <p class="symptom-name">Stale layouts</p>
+        <p class="symptom-desc">Manual memoization misses dependencies. A breakpoint change silently renders wrong data.</p>
       </div>
-      
-      <div class="problem-card">
-        <div class="problem-icon">&#128269;</div>
-        <h3>Performance debugging is guesswork</h3>
-        <p>"Why did this re-render?" has no answers. No visibility into what changed and why.</p>
+      <div class="symptom">
+        <p class="symptom-name">Invisible root cause</p>
+        <p class="symptom-desc">No tool surfaces which geometry invalidated and why. Debugging is trial and error.</p>
       </div>
     </div>
-    
-    <div class="evidence fade-in">
-      <p class="evidence-label">Real issues from popular libraries:</p>
-      <div class="evidence-list">
-        <a href="https://github.com/TanStack/virtual/issues/832" target="_blank" rel="noopener" class="evidence-item">
-          <span class="evidence-lib">TanStack Virtual</span>
-          <span class="evidence-issue">#832 — Scrolling with dynamic height lags and stutters</span>
+
+    <div class="issues" data-reveal>
+      <p class="issues-label">Evidence — open issues in production libraries</p>
+      <div class="issues-list">
+        <a href="https://github.com/TanStack/virtual/issues/832" target="_blank" rel="noopener" class="issue-row">
+          <span class="issue-ref">TanStack Virtual · #832</span>
+          <span class="issue-text">Scrolling with dynamic height lags and stutters</span>
         </a>
-        <a href="https://github.com/bvaughn/react-window/issues/741" target="_blank" rel="noopener" class="evidence-item">
-          <span class="evidence-lib">react-window</span>
-          <span class="evidence-issue">#741 — VariableSizeList causes major scroll jitters</span>
+        <a href="https://github.com/TanStack/virtual/issues/659" target="_blank" rel="noopener" class="issue-row">
+          <span class="issue-ref">TanStack Virtual · #659</span>
+          <span class="issue-text">Scrolling up with dynamic heights stutters</span>
         </a>
-        <a href="https://github.com/TanStack/virtual/issues/659" target="_blank" rel="noopener" class="evidence-item">
-          <span class="evidence-lib">TanStack Virtual</span>
-          <span class="evidence-issue">#659 — Scrolling up with dynamic heights stutters</span>
+        <a href="https://github.com/bvaughn/react-window/issues/741" target="_blank" rel="noopener" class="issue-row">
+          <span class="issue-ref">react-window · #741</span>
+          <span class="issue-text">VariableSizeList causes major scroll jitters</span>
         </a>
       </div>
     </div>
+
   </div>
 </section>
 
 <style>
-  .section {
-    padding: var(--space-4xl) 0;
+  .sect {
+    padding: var(--sp-24) 0;
+    border-top: 1px solid var(--border);
   }
 
-  .section-header {
-    text-align: center;
-    margin-bottom: var(--space-3xl);
-  }
-
-  .section-tag {
+  .sect-eyebrow {
     font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--sp-4);
   }
 
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(32px, 5vw, 48px);
+  .sect-heading {
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-3xl));
     font-weight: 600;
     line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-5);
   }
 
-  .text-muted {
-    color: var(--text-muted);
+  .sect-body {
+    font-size: var(--text-lg);
+    color: var(--fg-secondary);
+    max-width: 600px;
+    line-height: 1.65;
+    margin-bottom: var(--sp-12);
   }
 
-  .problem-grid {
+  .sect-body em {
+    font-style: normal;
+    color: var(--fg);
+  }
+
+  /* 2x2 symptom grid */
+  .symptoms {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-lg);
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: var(--sp-12);
   }
 
-  .problem-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  .symptom {
+    padding: var(--sp-6);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
   }
 
-  .problem-card:hover {
-    border-color: var(--accent);
-    box-shadow: var(--shadow-glow);
+  .symptom:nth-child(2n) { border-right: none; }
+  .symptom:nth-child(3),
+  .symptom:nth-child(4) { border-top: 1px solid var(--border); }
+
+  .symptom-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    margin-bottom: var(--sp-2);
   }
 
-  .problem-icon {
-    font-size: 32px;
-    margin-bottom: var(--space-md);
+  .symptom-desc {
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+    line-height: 1.55;
   }
 
-  .problem-card h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: var(--space-sm);
+  /* Issues table */
+  .issues-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--sp-3);
   }
 
-  .problem-card p {
-    color: var(--text-secondary);
-    font-size: 15px;
+  .issues-list {
+    border-top: 1px solid var(--border);
   }
 
-  .evidence {
-    margin-top: var(--space-2xl);
-  }
-
-  .evidence-label {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: var(--space-md);
-  }
-
-  .evidence-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-  }
-
-  .evidence-item {
+  .issue-row {
     display: flex;
     align-items: center;
-    gap: var(--space-lg);
-    padding: var(--space-md) var(--space-lg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    text-decoration: none;
-    transition: border-color var(--transition-base);
+    gap: var(--sp-6);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--border);
+    transition: opacity var(--duration) var(--ease);
   }
 
-  .evidence-item:hover {
-    border-color: var(--border-hover, var(--accent));
-  }
+  .issue-row:hover { opacity: 0.7; }
 
-  .evidence-lib {
+  .issue-ref {
     font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--text-primary);
-    min-width: 160px;
+    font-size: var(--text-xs);
+    color: var(--fg);
+    min-width: 200px;
+    white-space: nowrap;
   }
 
-  .evidence-issue {
-    color: var(--text-secondary);
-    font-size: 13px;
+  .issue-text {
+    font-size: var(--text-sm);
+    color: var(--fg-muted);
   }
 
-  @media (max-width: 768px) {
-    .problem-grid {
-      grid-template-columns: 1fr;
-    }
+  @media (max-width: 640px) {
+    .symptoms { grid-template-columns: 1fr; }
+    .symptom { border-right: none; }
+    .issue-row { flex-direction: column; align-items: flex-start; gap: var(--sp-1); }
+    .issue-ref { min-width: auto; }
   }
 </style>

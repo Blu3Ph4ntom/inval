@@ -10,19 +10,19 @@ const currentPage = '/docs/getting-started'
 <DocsLayout title="Getting Started — Inval Docs" description="Install Inval and build your first dependency graph.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
 
-  <div class="docs-page">
+  <div class="doc-page">
     <nav class="breadcrumb">
       <a href="/docs/">Docs</a>
-      <span>/</span>
+      <span class="bc-sep">/</span>
       <span>Getting Started</span>
     </nav>
 
-    <h1>Getting Started</h1>
-    <p class="lead">Get up and running with Inval in under 5 minutes.</p>
+    <h1 class="doc-h1">Getting Started</h1>
+    <p class="doc-lead">Get up and running with Inval in under 5 minutes.</p>
 
     <section id="installation">
-      <h2>Installation</h2>
-      <p>Install via your preferred package manager:</p>
+      <h2 class="doc-h2">Installation</h2>
+      <p class="doc-p">Install via your preferred package manager:</p>
 
       <CodeBlock 
         lang="bash"
@@ -35,7 +35,7 @@ bun add @blu3ph4ntom/inval
 pnpm add @blu3ph4ntom/inval`}
       />
 
-      <p>Or use the IIFE bundle directly in a script tag:</p>
+      <p class="doc-p">Or use the IIFE bundle directly in a script tag:</p>
 
       <CodeBlock 
         filename="index.html"
@@ -53,10 +53,10 @@ pnpm add @blu3ph4ntom/inval`}
     </section>
 
     <section id="quick-start">
-      <h2>Quick Start</h2>
-      <p>Let's build a simple dependency graph. We'll compute the area of a rectangle and see how Inval handles changes.</p>
+      <h2 class="doc-h2">Quick Start</h2>
+      <p class="doc-p">Let's build a simple dependency graph. We'll compute the area of a rectangle and see how Inval handles changes.</p>
 
-      <h3>Step 1: Import the API</h3>
+      <h3 class="doc-h3">Step 1: Import the API</h3>
 
       <CodeBlock 
         filename="step1.ts"
@@ -64,8 +64,8 @@ pnpm add @blu3ph4ntom/inval`}
         code={`import { input, node } from '@blu3ph4ntom/inval'`}
       />
 
-      <h3>Step 2: Create input nodes</h3>
-      <p>Input nodes are leaf nodes. They hold values that external code sets.</p>
+      <h3 class="doc-h3">Step 2: Create input nodes</h3>
+      <p class="doc-p">Input nodes are leaf nodes. They hold values that external code sets.</p>
 
       <CodeBlock 
         filename="step2.ts"
@@ -77,8 +77,8 @@ width.get()   // 800
 height.get()  // 600`}
       />
 
-      <h3>Step 3: Create a computed node</h3>
-      <p>Computed nodes declare their dependencies and compute lazily.</p>
+      <h3 class="doc-h3">Step 3: Create a computed node</h3>
+      <p class="doc-p">Computed nodes declare their dependencies and compute lazily.</p>
 
       <CodeBlock 
         filename="step3.ts"
@@ -91,7 +91,7 @@ height.get()  // 600`}
 area.get()  // 480000 — computes on first access`}
       />
 
-      <h3>Step 4: Change an input and observe</h3>
+      <h3 class="doc-h3">Step 4: Change an input and observe</h3>
 
       <CodeBlock 
         filename="step4.ts"
@@ -103,13 +103,13 @@ area.get()  // 600000 — recomputes because width changed`}
       />
 
       <Callout type="tip">
-        <p>The key insight: <code>area.get()</code> returns the cached value if nothing changed. It only recomputes when a dependency is dirty.</p>
+        <p>The key insight: <code class="doc-code">area.get()</code> returns the cached value if nothing changed. It only recomputes when a dependency is dirty.</p>
       </Callout>
     </section>
 
     <section id="your-first-graph">
-      <h2>Your First Graph</h2>
-      <p>Let's build something more realistic — a dashboard layout with dependent widgets.</p>
+      <h2 class="doc-h2">Your First Graph</h2>
+      <p class="doc-p">Let's build something more realistic — a dashboard layout with dependent widgets.</p>
 
       <CodeBlock 
         filename="dashboard.ts"
@@ -156,16 +156,16 @@ const changed = batch(() => {
       />
 
       <Callout type="warning">
-        <p>Always use <code>batch()</code> when setting multiple inputs at once. This ensures a single atomic update instead of cascading invalidations.</p>
+        <p>Always use <code class="doc-code">batch()</code> when setting multiple inputs at once. This ensures a single atomic update instead of cascading invalidations.</p>
       </Callout>
     </section>
 
     <div class="page-nav">
-      <a href="/docs/" class="page-nav-prev">
+      <a href="/docs/">
         <span>←</span>
         <span>Introduction</span>
       </a>
-      <a href="/docs/core-concepts" class="page-nav-next">
+      <a href="/docs/core-concepts">
         <span>Core Concepts</span>
         <span>→</span>
       </a>
@@ -174,106 +174,126 @@ const changed = batch(() => {
 </DocsLayout>
 
 <style>
-  .docs-page {
-    padding: 48px 64px;
-    max-width: 800px;
+  .doc-page {
+    max-width: 680px;
+    padding: var(--sp-12) var(--sp-10);
   }
 
   .breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
-  }
-
-  .breadcrumb a {
-    color: var(--text-secondary);
-  }
-
-  .breadcrumb span:last-child {
-    color: var(--text-primary);
-  }
-
-  h1 {
-    font-family: var(--font-display);
-    font-size: 40px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .lead {
-    font-size: 18px;
-    color: var(--text-secondary);
-    margin-bottom: 48px;
-  }
-
-  h2 {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 600;
-    margin-top: 48px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-top: 32px;
-    margin-bottom: 12px;
-  }
-
-  p {
-    color: var(--text-secondary);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-  }
-
-  code {
+    gap: var(--sp-2);
     font-family: var(--font-mono);
-    font-size: 0.9em;
-    background: var(--bg-tertiary);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: var(--accent);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    margin-bottom: var(--sp-8);
   }
 
+  .breadcrumb a { color: var(--fg-muted); transition: color var(--duration) var(--ease); }
+  .breadcrumb a:hover { color: var(--fg-secondary); }
+  .bc-sep { color: var(--fg-muted); opacity: 0.4; }
+
+  .doc-h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-3);
+  }
+
+  .doc-lead {
+    font-size: var(--text-lg);
+    color: var(--fg-secondary);
+    margin-bottom: var(--sp-10);
+    line-height: 1.65;
+  }
+
+  .doc-h2 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-top: var(--sp-12);
+    margin-bottom: var(--sp-4);
+    padding-top: var(--sp-12);
+    border-top: 1px solid var(--border);
+  }
+
+  .doc-h2:first-of-type { margin-top: var(--sp-8); padding-top: 0; border-top: none; }
+
+  .doc-h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-3);
+  }
+
+  .doc-p {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--sp-4);
+  }
+
+  .doc-ul {
+    list-style: none;
+    margin-bottom: var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .doc-ul li {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
+    line-height: 1.6;
+    padding-left: var(--sp-4);
+    position: relative;
+  }
+
+  .doc-ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--fg-muted);
+    font-size: var(--text-xs);
+  }
+
+  .doc-code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    color: var(--fg);
+    background: var(--bg-muted);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  strong { color: var(--fg); font-weight: 500; }
+
+  /* Page nav */
   .page-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 64px;
-    padding-top: 24px;
+    margin-top: var(--sp-16);
+    padding-top: var(--sp-6);
     border-top: 1px solid var(--border);
   }
 
-  .page-nav-prev,
-  .page-nav-next {
+  .page-nav a {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    gap: var(--sp-2);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    padding: var(--sp-2) var(--sp-4);
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
   }
 
-  .page-nav-prev:hover,
-  .page-nav-next:hover {
-    border-color: var(--accent);
-    color: var(--text-primary);
-    text-decoration: none;
-  }
+  .page-nav a:hover { color: var(--fg); border-color: var(--border-hover); }
 
-  @media (max-width: 1024px) {
-    .docs-page {
-      padding: 32px 24px;
-    }
+  @media (max-width: 960px) {
+    .doc-page { padding: var(--sp-8) var(--sp-5); }
   }
 </style>

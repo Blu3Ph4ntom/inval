@@ -10,50 +10,48 @@ const currentPage = '/docs/api-reference'
 <DocsLayout title="API Reference — Inval Docs" description="Complete API reference for all Inval functions and types.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
 
-  <div class="docs-page">
+  <div class="doc-page">
     <nav class="breadcrumb">
       <a href="/docs/">Docs</a>
-      <span>/</span>
+      <span class="bc-sep">/</span>
       <span>API Reference</span>
     </nav>
 
-    <h1>API Reference</h1>
-    <p class="lead">Complete reference for all exported functions and types.</p>
+    <h1 class="doc-h1">API Reference</h1>
+    <p class="doc-lead">Complete reference for all exported functions and types.</p>
 
     <section id="input">
-      <h2><code>input(value)</code></h2>
-      <p>Creates a leaf input node. External code sets the value.</p>
+      <h2 class="doc-h2"><code class="doc-code">input(value)</code></h2>
+      <p class="doc-p">Creates a leaf input node. External code sets the value.</p>
 
-      <h3>Signature</h3>
+      <h3 class="doc-h3">Signature</h3>
       <CodeBlock 
         lang="typescript"
         code={`function input<T>(value: T): InputNode<T>`}
       />
 
-      <h3>Parameters</h3>
-      <div class="param-table">
-        <table>
-          <thead>
-            <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>value</code></td><td><code>T</code></td><td>Initial value of any type</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <h3 class="doc-h3">Parameters</h3>
+      <table class="param-table">
+        <thead>
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="doc-code">value</code></td><td><code class="doc-code">T</code></td><td>Initial value of any type</td></tr>
+        </tbody>
+      </table>
 
-      <h3>Returns</h3>
-      <p>An <code>InputNode&lt;T&gt;</code> with methods:</p>
-      <ul>
-        <li><code>get(): T</code> — returns current value</li>
-        <li><code>set(value: T): void</code> — updates value, marks dependents dirty</li>
-        <li><code>invalidate(): void</code> — forces invalidation of dependents</li>
-        <li><code>isDirty(): false</code> — inputs are never dirty</li>
-        <li><code>inspect(): InspectInfo</code> — debug information</li>
-        <li><code>dispose(): void</code> — disconnect from graph</li>
+      <h3 class="doc-h3">Returns</h3>
+      <p class="doc-p">An <code class="doc-code">InputNode&lt;T&gt;</code> with methods:</p>
+      <ul class="doc-ul">
+        <li><code class="doc-code">get(): T</code> — returns current value</li>
+        <li><code class="doc-code">set(value: T): void</code> — updates value, marks dependents dirty</li>
+        <li><code class="doc-code">invalidate(): void</code> — forces invalidation of dependents</li>
+        <li><code class="doc-code">isDirty(): false</code> — inputs are never dirty</li>
+        <li><code class="doc-code">inspect(): InspectInfo</code> — debug information</li>
+        <li><code class="doc-code">dispose(): void</code> — disconnect from graph</li>
       </ul>
 
-      <h3>Example</h3>
+      <h3 class="doc-h3">Example</h3>
       <CodeBlock 
         filename="input-example.ts"
         lang="typescript"
@@ -64,10 +62,10 @@ width.set(600)  // marks dependents dirty`}
     </section>
 
     <section id="node">
-      <h2><code>node(options)</code></h2>
-      <p>Creates a computed node with declared dependencies. Lazy evaluation, cached results.</p>
+      <h2 class="doc-h2"><code class="doc-code">node(options)</code></h2>
+      <p class="doc-p">Creates a computed node with declared dependencies. Lazy evaluation, cached results.</p>
 
-      <h3>Signature</h3>
+      <h3 class="doc-h3">Signature</h3>
       <CodeBlock 
         lang="typescript"
         code={`function node<DependsOn extends Record<string, Node<any>>, R>(
@@ -78,30 +76,28 @@ width.set(600)  // marks dependents dirty`}
 ): ComputedNode<R>`}
       />
 
-      <h3>Options</h3>
-      <div class="param-table">
-        <table>
-          <thead>
-            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>dependsOn</code></td><td><code>Record&lt;string, Node&gt;</code></td><td>Map of names to dependency nodes</td></tr>
-            <tr><td><code>compute</code></td><td><code>(values) => R</code></td><td>Function that computes the result from resolved dependency values</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <h3 class="doc-h3">Options</h3>
+      <table class="param-table">
+        <thead>
+          <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="doc-code">dependsOn</code></td><td><code class="doc-code">Record&lt;string, Node&gt;</code></td><td>Map of names to dependency nodes</td></tr>
+          <tr><td><code class="doc-code">compute</code></td><td><code class="doc-code">(values) => R</code></td><td>Function that computes the result from resolved dependency values</td></tr>
+        </tbody>
+      </table>
 
-      <h3>Returns</h3>
-      <p>A <code>ComputedNode&lt;R&gt;</code> with methods:</p>
-      <ul>
-        <li><code>get(): R</code> — returns cached value or recomputes if dirty</li>
-        <li><code>isDirty(): boolean</code> — true if any dependency changed</li>
-        <li><code>invalidate(): void</code> — forces recompute on next get()</li>
-        <li><code>inspect(): InspectInfo</code> — debug information</li>
-        <li><code>dispose(): void</code> — disconnect from graph</li>
+      <h3 class="doc-h3">Returns</h3>
+      <p class="doc-p">A <code class="doc-code">ComputedNode&lt;R&gt;</code> with methods:</p>
+      <ul class="doc-ul">
+        <li><code class="doc-code">get(): R</code> — returns cached value or recomputes if dirty</li>
+        <li><code class="doc-code">isDirty(): boolean</code> — true if any dependency changed</li>
+        <li><code class="doc-code">invalidate(): void</code> — forces recompute on next get()</li>
+        <li><code class="doc-code">inspect(): InspectInfo</code> — debug information</li>
+        <li><code class="doc-code">dispose(): void</code> — disconnect from graph</li>
       </ul>
 
-      <h3>Example</h3>
+      <h3 class="doc-h3">Example</h3>
       <CodeBlock 
         filename="node-example.ts"
         lang="typescript"
@@ -120,21 +116,21 @@ area.get()    // 600000 (recomputed)`}
       />
 
       <Callout type="danger">
-        <p>The <code>compute</code> function must be <strong>pure</strong>. No side effects. It may be called multiple times or not at all depending on cache state.</p>
+        <p>The <code class="doc-code">compute</code> function must be <strong>pure</strong>. No side effects. It may be called multiple times or not at all depending on cache state.</p>
       </Callout>
     </section>
 
     <section id="batch">
-      <h2><code>batch(fn)</code></h2>
-      <p>Executes a function atomically. All input sets within the batch trigger a single invalidation walk. Returns the set of changed nodes.</p>
+      <h2 class="doc-h2"><code class="doc-code">batch(fn)</code></h2>
+      <p class="doc-p">Executes a function atomically. All input sets within the batch trigger a single invalidation walk. Returns the set of changed nodes.</p>
 
-      <h3>Signature</h3>
+      <h3 class="doc-h3">Signature</h3>
       <CodeBlock 
         lang="typescript"
         code={`function batch<T>(fn: () => T): T | Set<Node<any>>`}
       />
 
-      <h3>Example</h3>
+      <h3 class="doc-h3">Example</h3>
       <CodeBlock 
         filename="batch-example.ts"
         lang="typescript"
@@ -147,16 +143,16 @@ area.get()    // 600000 (recomputed)`}
     </section>
 
     <section id="why">
-      <h2><code>why(node)</code></h2>
-      <p>Traces the invalidation path for a node. Returns an array of node names from the target back to the source inputs that caused invalidation.</p>
+      <h2 class="doc-h2"><code class="doc-code">why(node)</code></h2>
+      <p class="doc-p">Traces the invalidation path for a node. Returns an array of node names from the target back to the source inputs that caused invalidation.</p>
 
-      <h3>Signature</h3>
+      <h3 class="doc-h3">Signature</h3>
       <CodeBlock 
         lang="typescript"
         code={`function why(node: Node<any>): string[]`}
       />
 
-      <h3>Example</h3>
+      <h3 class="doc-h3">Example</h3>
       <CodeBlock 
         filename="why-example.ts"
         lang="typescript"
@@ -171,17 +167,17 @@ why(cardHeight) // ['cardHeight', 'textHeight', 'width']`}
     </section>
 
     <section id="ancestors-descendants">
-      <h2><code>ancestors(node)</code> / <code>descendants(node)</code></h2>
-      <p>Navigate the dependency graph. <code>ancestors</code> returns all upstream dependencies. <code>descendants</code> returns all downstream dependents.</p>
+      <h2 class="doc-h2"><code class="doc-code">ancestors(node)</code> / <code class="doc-code">descendants(node)</code></h2>
+      <p class="doc-p">Navigate the dependency graph. <code class="doc-code">ancestors</code> returns all upstream dependencies. <code class="doc-code">descendants</code> returns all downstream dependents.</p>
 
-      <h3>Signature</h3>
+      <h3 class="doc-h3">Signature</h3>
       <CodeBlock 
         lang="typescript"
         code={`function ancestors(node: Node<any>): Set<Node<any>>
 function descendants(node: Node<any>): Set<Node<any>>`}
       />
 
-      <h3>Example</h3>
+      <h3 class="doc-h3">Example</h3>
       <CodeBlock 
         filename="graph-nav.ts"
         lang="typescript"
@@ -195,16 +191,16 @@ descendants(a) // Set { b, c }`}
     </section>
 
     <section id="todot">
-      <h2><code>toDot(nodes)</code></h2>
-      <p>Exports the dependency graph as Graphviz DOT format for visualization.</p>
+      <h2 class="doc-h2"><code class="doc-code">toDot(nodes)</code></h2>
+      <p class="doc-p">Exports the dependency graph as Graphviz DOT format for visualization.</p>
 
-      <h3>Signature</h3>
+      <h3 class="doc-h3">Signature</h3>
       <CodeBlock 
         lang="typescript"
         code={`function toDot(nodes: Node<any>[]): string`}
       />
 
-      <h3>Example</h3>
+      <h3 class="doc-h3">Example</h3>
       <CodeBlock 
         filename="dot-example.ts"
         lang="typescript"
@@ -219,10 +215,10 @@ descendants(a) // Set { b, c }`}
     </section>
 
     <section id="stats">
-      <h2><code>stats(nodes)</code></h2>
-      <p>Returns statistics about the dependency graph.</p>
+      <h2 class="doc-h2"><code class="doc-code">stats(nodes)</code></h2>
+      <p class="doc-p">Returns statistics about the dependency graph.</p>
 
-      <h3>Signature</h3>
+      <h3 class="doc-h3">Signature</h3>
       <CodeBlock 
         lang="typescript"
         code={`function stats(nodes: Node<any[]>): {
@@ -234,7 +230,7 @@ descendants(a) // Set { b, c }`}
 }`}
       />
 
-      <h3>Example</h3>
+      <h3 class="doc-h3">Example</h3>
       <CodeBlock 
         filename="stats-example.ts"
         lang="typescript"
@@ -250,9 +246,9 @@ descendants(a) // Set { b, c }`}
     </section>
 
     <section id="types">
-      <h2>TypeScript Types</h2>
+      <h2 class="doc-h2">TypeScript Types</h2>
 
-      <h3><code>InputNode&lt;T&gt;</code></h3>
+      <h3 class="doc-h3"><code class="doc-code">InputNode&lt;T&gt;</code></h3>
       <CodeBlock 
         lang="typescript"
         code={`interface InputNode<T> {
@@ -265,7 +261,7 @@ descendants(a) // Set { b, c }`}
 }`}
       />
 
-      <h3><code>ComputedNode&lt;T&gt;</code></h3>
+      <h3 class="doc-h3"><code class="doc-code">ComputedNode&lt;T&gt;</code></h3>
       <CodeBlock 
         lang="typescript"
         code={`interface ComputedNode<T> {
@@ -277,7 +273,7 @@ descendants(a) // Set { b, c }`}
 }`}
       />
 
-      <h3><code>InspectInfo</code></h3>
+      <h3 class="doc-h3"><code class="doc-code">InspectInfo</code></h3>
       <CodeBlock 
         lang="typescript"
         code={`interface InspectInfo {
@@ -293,11 +289,11 @@ descendants(a) // Set { b, c }`}
     </section>
 
     <div class="page-nav">
-      <a href="/docs/core-concepts" class="page-nav-prev">
+      <a href="/docs/core-concepts">
         <span>←</span>
         <span>Core Concepts</span>
       </a>
-      <a href="/docs/guides/virtualized-lists" class="page-nav-next">
+      <a href="/docs/guides/virtualized-lists">
         <span>Guides</span>
         <span>→</span>
       </a>
@@ -306,146 +302,139 @@ descendants(a) // Set { b, c }`}
 </DocsLayout>
 
 <style>
-  .docs-page {
-    padding: 48px 64px;
-    max-width: 800px;
+  .doc-page {
+    max-width: 680px;
+    padding: var(--sp-12) var(--sp-10);
   }
 
   .breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    margin-bottom: var(--sp-8);
   }
 
-  .breadcrumb a { color: var(--text-secondary); }
-  .breadcrumb span:last-child { color: var(--text-primary); }
+  .breadcrumb a { color: var(--fg-muted); transition: color var(--duration) var(--ease); }
+  .breadcrumb a:hover { color: var(--fg-secondary); }
+  .bc-sep { color: var(--fg-muted); opacity: 0.4; }
 
-  h1 {
-    font-family: var(--font-display);
-    font-size: 40px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .lead {
-    font-size: 18px;
-    color: var(--text-secondary);
-    margin-bottom: 48px;
-  }
-
-  h2 {
-    font-family: var(--font-display);
-    font-size: 28px;
+  .doc-h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
     font-weight: 600;
-    margin-top: 48px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-3);
   }
 
-  h2 code {
-    font-size: 24px;
+  .doc-lead {
+    font-size: var(--text-lg);
+    color: var(--fg-secondary);
+    margin-bottom: var(--sp-10);
+    line-height: 1.65;
+  }
+
+  .doc-h2 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-top: var(--sp-12);
+    margin-bottom: var(--sp-4);
+    padding-top: var(--sp-12);
+    border-top: 1px solid var(--border);
+  }
+
+  .doc-h2:first-of-type { margin-top: var(--sp-8); padding-top: 0; border-top: none; }
+
+  .doc-h2 .doc-code {
+    font-size: var(--text-lg);
     background: none;
     padding: 0;
-    color: var(--text-primary);
+    color: var(--fg);
   }
 
-  h3 {
-    font-size: 18px;
+  .doc-h3 {
+    font-size: var(--text-base);
     font-weight: 600;
-    color: var(--text-primary);
-    margin-top: 32px;
-    margin-bottom: 12px;
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-3);
   }
 
-  p {
-    color: var(--text-secondary);
-    font-size: 15px;
+  .doc-p {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
     line-height: 1.7;
-    margin-bottom: 16px;
+    margin-bottom: var(--sp-4);
   }
 
-  ul {
-    color: var(--text-secondary);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-    padding-left: 24px;
+  .doc-ul {
+    list-style: none;
+    margin-bottom: var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
   }
 
-  ul li { margin-bottom: 8px; }
+  .doc-ul li {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
+    line-height: 1.6;
+    padding-left: var(--sp-4);
+    position: relative;
+  }
 
-  code {
+  .doc-ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--fg-muted);
+    font-size: var(--text-xs);
+  }
+
+  .doc-code {
     font-family: var(--font-mono);
-    font-size: 0.9em;
-    background: var(--bg-tertiary);
-    padding: 2px 6px;
+    font-size: 0.88em;
+    color: var(--fg);
+    background: var(--bg-muted);
+    padding: 1px 6px;
     border-radius: 4px;
-    color: var(--accent);
   }
 
-  .param-table {
-    margin: 16px 0;
-    overflow-x: auto;
-  }
+  strong { color: var(--fg); font-weight: 500; }
 
-  .param-table table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
+  /* Param table */
+  .param-table { width: 100%; border-collapse: collapse; margin: var(--sp-4) 0; }
+  .param-table th { text-align: left; padding: var(--sp-2) var(--sp-3); background: var(--bg-muted); border: 1px solid var(--border); font-size: var(--text-xs); font-weight: 500; color: var(--fg-secondary); }
+  .param-table td { padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); font-size: var(--text-sm); color: var(--fg-secondary); }
+  .param-table td:first-child { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg); }
 
-  .param-table th {
-    text-align: left;
-    padding: 8px 12px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .param-table td {
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-  }
-
-  .param-table td code {
-    font-size: 0.85em;
-  }
-
+  /* Page nav */
   .page-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 64px;
-    padding-top: 24px;
+    margin-top: var(--sp-16);
+    padding-top: var(--sp-6);
     border-top: 1px solid var(--border);
   }
 
-  .page-nav-prev,
-  .page-nav-next {
+  .page-nav a {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    gap: var(--sp-2);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    padding: var(--sp-2) var(--sp-4);
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
   }
 
-  .page-nav-prev:hover,
-  .page-nav-next:hover {
-    border-color: var(--accent);
-    color: var(--text-primary);
-    text-decoration: none;
-  }
+  .page-nav a:hover { color: var(--fg); border-color: var(--border-hover); }
 
-  @media (max-width: 1024px) {
-    .docs-page { padding: 32px 24px; }
+  @media (max-width: 960px) {
+    .doc-page { padding: var(--sp-8) var(--sp-5); }
   }
 </style>

@@ -1,149 +1,118 @@
-<header class="navbar" x-data="{ mobileOpen: false }">
-  <div class="navbar-inner">
-    <a href="/" class="navbar-logo">inval</a>
+<header class="nav" x-data="{ open: false }">
+  <div class="wrap nav-inner">
+    <a href="/" class="nav-wordmark">inval</a>
 
-    <nav class="navbar-links" :class="{ open: mobileOpen }">
+    <nav class="nav-links" :class="{ 'is-open': open }">
       <a href="#features">Features</a>
-      <a href="#demo">Demo</a>
-      <a href="/docs">Docs</a>
+      <a href="#benchmarks">Performance</a>
+      <a href="/docs/">Docs</a>
       <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener">GitHub</a>
-      <a href="/docs" class="btn-primary">Get Started</a>
     </nav>
 
-    <button class="mobile-toggle" @click="mobileOpen = !mobileOpen" aria-label="Toggle menu">
-      <span :class="{ open: mobileOpen }"></span>
-      <span :class="{ open: mobileOpen }"></span>
-      <span :class="{ open: mobileOpen }"></span>
+    <a href="/docs/getting-started" class="nav-cta">Get Started</a>
+
+    <button class="nav-burger" @click="open = !open" :aria-expanded="open" aria-label="Menu">
+      <span></span>
+      <span></span>
     </button>
   </div>
 </header>
 
 <style>
-  .navbar {
+  .nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background: rgba(9, 9, 11, 0.8);
+    height: var(--nav-h);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
-    height: 64px;
   }
 
-  .navbar-inner {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 var(--space-4);
+  .nav-inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     height: 100%;
+    gap: var(--sp-8);
   }
 
-  .navbar-logo {
+  .nav-wordmark {
     font-family: var(--font-mono);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--accent);
-    text-decoration: none;
-    letter-spacing: -0.5px;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    margin-right: auto;
   }
 
-  .navbar-links {
+  .nav-links {
     display: flex;
     align-items: center;
-    gap: var(--space-6);
+    gap: var(--sp-6);
   }
 
-  .navbar-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 14px;
+  .nav-links a {
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+    transition: color var(--duration) var(--ease);
+  }
+
+  .nav-links a:hover { color: var(--fg); }
+
+  .nav-cta {
+    font-size: var(--text-sm);
     font-weight: 500;
-    transition: color var(--transition-fast);
-  }
-
-  .navbar-links a:hover {
-    color: var(--text-primary);
-  }
-
-  .navbar-links .btn-primary {
+    color: var(--accent-fg);
     background: var(--accent);
-    color: var(--bg-primary);
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--radius-sm);
+    transition: opacity var(--duration) var(--ease);
   }
 
-  .navbar-links .btn-primary:hover {
-    transform: scale(1.02);
-    box-shadow: var(--shadow-glow);
-    color: var(--bg-primary);
-  }
+  .nav-cta:hover { opacity: 0.85; }
 
-  .mobile-toggle {
+  .nav-burger {
     display: none;
     flex-direction: column;
     gap: 5px;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
+    padding: var(--sp-1);
   }
 
-  .mobile-toggle span {
+  .nav-burger span {
     display: block;
-    width: 22px;
-    height: 2px;
-    background: var(--text-primary);
-    border-radius: 2px;
-    transition: transform var(--transition-fast), opacity var(--transition-fast);
-  }
-
-  .mobile-toggle span.open:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
-  }
-
-  .mobile-toggle span.open:nth-child(2) {
-    opacity: 0;
-  }
-
-  .mobile-toggle span.open:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
+    width: 18px;
+    height: 1.5px;
+    background: var(--fg);
+    border-radius: 1px;
+    transition: transform var(--duration) var(--ease), opacity var(--duration) var(--ease);
   }
 
   @media (max-width: 768px) {
-    .mobile-toggle {
-      display: flex;
-    }
-
-    .navbar-links {
-      position: absolute;
-      top: 64px;
-      left: 0;
-      right: 0;
-      background: rgba(9, 9, 11, 0.95);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+    .nav-cta { display: none; }
+    .nav-burger { display: flex; }
+    .nav-links {
+      position: fixed;
+      inset: var(--nav-h) 0 0 0;
+      background: var(--bg);
       flex-direction: column;
-      padding: var(--space-6) var(--space-4);
-      gap: var(--space-4);
+      align-items: flex-start;
+      padding: var(--sp-6);
+      gap: var(--sp-4);
+      border-top: 1px solid var(--border);
       transform: translateY(-100%);
       opacity: 0;
       pointer-events: none;
-      transition: transform var(--transition-base), opacity var(--transition-base);
+      transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
     }
-
-    .navbar-links.open {
-      transform: translateY(0);
+    .nav-links.is-open {
+      transform: none;
       opacity: 1;
       pointer-events: auto;
     }
-
-    .navbar-links a {
-      font-size: 16px;
-    }
+    .nav-links a { font-size: var(--text-lg); }
   }
 </style>

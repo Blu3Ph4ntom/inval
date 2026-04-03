@@ -10,32 +10,32 @@ const currentPage = '/docs/'
 <DocsLayout title="Introduction — Inval Docs" description="Learn what Inval is and why you need it.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
 
-  <div class="docs-page">
+  <div class="doc-page">
     <nav class="breadcrumb">
       <a href="/docs/">Docs</a>
-      <span>/</span>
+      <span class="bc-sep">/</span>
       <span>Introduction</span>
     </nav>
 
-    <h1>Introduction</h1>
-    <p class="lead">Deterministic, incremental layout invalidation engine.</p>
+    <h1 class="doc-h1">Introduction</h1>
+    <p class="doc-lead">Deterministic, incremental layout invalidation engine.</p>
 
     <section id="what-is-inval">
-      <h2>What is Inval?</h2>
-      <p>Inval is a <strong>dependency graph engine</strong> for tracking computed values. It's not a framework, not a renderer, and not a state management library.</p>
-      <p>It answers one question: <em>"What geometry changed, and what depends on it?"</em></p>
-      <p>When you build interactive UIs — dashboards, virtualized lists, resizable panels — layout changes cascade. A sidebar width change affects content width, which changes text wrapping, which shifts card heights, which breaks scroll positions.</p>
-      <p>Most apps handle this by recomputing everything on every change. Inval gives you the primitive to do it <strong>incrementally</strong>.</p>
+      <h2 class="doc-h2">What is Inval?</h2>
+      <p class="doc-p">Inval is a <strong>dependency graph engine</strong> for tracking computed values. It's not a framework, not a renderer, and not a state management library.</p>
+      <p class="doc-p">It answers one question: <em>"What geometry changed, and what depends on it?"</em></p>
+      <p class="doc-p">When you build interactive UIs — dashboards, virtualized lists, resizable panels — layout changes cascade. A sidebar width change affects content width, which changes text wrapping, which shifts card heights, which breaks scroll positions.</p>
+      <p class="doc-p">Most apps handle this by recomputing everything on every change. Inval gives you the primitive to do it <strong>incrementally</strong>.</p>
     </section>
 
     <section id="why-inval">
-      <h2>Why Inval?</h2>
-      <p>Popular virtualization libraries struggle with dynamic height issues:</p>
-      <ul>
+      <h2 class="doc-h2">Why Inval?</h2>
+      <p class="doc-p">Popular virtualization libraries struggle with dynamic height issues:</p>
+      <ul class="doc-ul">
         <li><strong>TanStack Virtual</strong> — issues #832, #659: scrolling with dynamic height lags and stutters</li>
         <li><strong>react-window</strong> — issue #741: VariableSizeList causes major scroll jitters</li>
       </ul>
-      <p><strong>Root cause:</strong> No dependency graph means recomputing ALL nodes on ANY change.</p>
+      <p class="doc-p"><strong>Root cause:</strong> No dependency graph means recomputing ALL nodes on ANY change.</p>
 
       <Callout type="tip">
         <p>Inval solves this at the engine level. Declare what depends on what, and the engine handles incremental updates automatically.</p>
@@ -43,7 +43,7 @@ const currentPage = '/docs/'
     </section>
 
     <section id="quick-example">
-      <h2>Quick Example</h2>
+      <h2 class="doc-h2">Quick Example</h2>
 
       <CodeBlock 
         filename="example.ts"
@@ -71,49 +71,49 @@ why(area)         // ['area', 'width'] — trace invalidation path`}
     </section>
 
     <section id="key-principles">
-      <h2>Key Principles</h2>
+      <h2 class="doc-h2">Key Principles</h2>
       <div class="principles-grid">
         <div class="principle-card">
-          <h3>DAG</h3>
-          <p>Nodes form a directed acyclic graph. Cycles are detected at construction time.</p>
+          <h3 class="doc-h3">DAG</h3>
+          <p class="doc-p">Nodes form a directed acyclic graph. Cycles are detected at construction time.</p>
         </div>
         <div class="principle-card">
-          <h3>Lazy</h3>
-          <p><code>node.get()</code> recomputes only if dirty. Returns cached value otherwise.</p>
+          <h3 class="doc-h3">Lazy</h3>
+          <p class="doc-p"><code class="doc-code">node.get()</code> recomputes only if dirty. Returns cached value otherwise.</p>
         </div>
         <div class="principle-card">
-          <h3>Incremental</h3>
-          <p><code>input.set()</code> walks children, marks only affected nodes dirty.</p>
+          <h3 class="doc-h3">Incremental</h3>
+          <p class="doc-p"><code class="doc-code">input.set()</code> walks children, marks only affected nodes dirty.</p>
         </div>
         <div class="principle-card">
-          <h3>Pure</h3>
-          <p>No DOM. You measure, you pass values in. Framework agnostic.</p>
+          <h3 class="doc-h3">Pure</h3>
+          <p class="doc-p">No DOM. You measure, you pass values in. Framework agnostic.</p>
         </div>
         <div class="principle-card">
-          <h3>Zero deps</h3>
-          <p>Pure TypeScript. 12KB packed. No external runtime dependencies.</p>
+          <h3 class="doc-h3">Zero deps</h3>
+          <p class="doc-p">Pure TypeScript. 12KB packed. No external runtime dependencies.</p>
         </div>
         <div class="principle-card">
-          <h3>Debuggable</h3>
-          <p><code>why()</code>, <code>inspect()</code>, <code>toDot()</code> for full visibility.</p>
+          <h3 class="doc-h3">Debuggable</h3>
+          <p class="doc-p"><code class="doc-code">why()</code>, <code class="doc-code">inspect()</code>, <code class="doc-code">toDot()</code> for full visibility.</p>
         </div>
       </div>
     </section>
 
     <section id="next-steps">
-      <h2>Next Steps</h2>
+      <h2 class="doc-h2">Next Steps</h2>
       <div class="next-steps">
         <a href="/docs/getting-started" class="next-step-card">
           <span class="next-step-label">Next</span>
-          <h3>Getting Started →</h3>
-          <p>Install Inval and build your first dependency graph in 5 minutes.</p>
+          <h3 class="doc-h3">Getting Started →</h3>
+          <p class="doc-p">Install Inval and build your first dependency graph in 5 minutes.</p>
         </a>
       </div>
     </section>
 
     <div class="page-nav">
       <div></div>
-      <a href="/docs/getting-started" class="page-nav-next">
+      <a href="/docs/getting-started">
         <span>Getting Started</span>
         <span>→</span>
       </a>
@@ -122,188 +122,195 @@ why(area)         // ['area', 'width'] — trace invalidation path`}
 </DocsLayout>
 
 <style>
-  .docs-page {
-    padding: 48px 64px;
-    max-width: 800px;
+  .doc-page {
+    max-width: 680px;
+    padding: var(--sp-12) var(--sp-10);
   }
 
   .breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
-  }
-
-  .breadcrumb a {
-    color: var(--text-secondary);
-  }
-
-  .breadcrumb span:last-child {
-    color: var(--text-primary);
-  }
-
-  h1 {
-    font-family: var(--font-display);
-    font-size: 40px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .lead {
-    font-size: 18px;
-    color: var(--text-secondary);
-    margin-bottom: 48px;
-  }
-
-  h2 {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 600;
-    margin-top: 48px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  p {
-    color: var(--text-secondary);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-  }
-
-  ul {
-    color: var(--text-secondary);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-    padding-left: 24px;
-  }
-
-  ul li {
-    margin-bottom: 8px;
-  }
-
-  strong {
-    color: var(--text-primary);
-  }
-
-  code {
+    gap: var(--sp-2);
     font-family: var(--font-mono);
-    font-size: 0.9em;
-    background: var(--bg-tertiary);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: var(--accent);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    margin-bottom: var(--sp-8);
   }
+
+  .breadcrumb a { color: var(--fg-muted); transition: color var(--duration) var(--ease); }
+  .breadcrumb a:hover { color: var(--fg-secondary); }
+  .bc-sep { color: var(--fg-muted); opacity: 0.4; }
+
+  .doc-h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-3);
+  }
+
+  .doc-lead {
+    font-size: var(--text-lg);
+    color: var(--fg-secondary);
+    margin-bottom: var(--sp-10);
+    line-height: 1.65;
+  }
+
+  .doc-h2 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-top: var(--sp-12);
+    margin-bottom: var(--sp-4);
+    padding-top: var(--sp-12);
+    border-top: 1px solid var(--border);
+  }
+
+  .doc-h2:first-of-type { margin-top: var(--sp-8); padding-top: 0; border-top: none; }
+
+  .doc-h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-3);
+  }
+
+  .doc-p {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--sp-4);
+  }
+
+  .doc-ul {
+    list-style: none;
+    margin-bottom: var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .doc-ul li {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
+    line-height: 1.6;
+    padding-left: var(--sp-4);
+    position: relative;
+  }
+
+  .doc-ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--fg-muted);
+    font-size: var(--text-xs);
+  }
+
+  .doc-code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    color: var(--fg);
+    background: var(--bg-muted);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  strong { color: var(--fg); font-weight: 500; }
 
   .principles-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin: 24px 0;
+    gap: var(--sp-4);
+    margin: var(--sp-6) 0;
   }
 
   .principle-card {
-    background: var(--bg-secondary);
+    background: var(--bg-subtle);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    padding: var(--sp-5);
+    transition: border-color var(--duration) var(--ease);
   }
 
   .principle-card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.1);
+    border-color: var(--fg-muted);
   }
 
-  .principle-card h3 {
+  .principle-card .doc-h3 {
     font-family: var(--font-mono);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--accent);
-    margin-bottom: 8px;
+    margin-top: 0;
   }
 
-  .principle-card p {
-    font-size: 14px;
+  .principle-card .doc-p {
+    font-size: var(--text-sm);
     margin-bottom: 0;
   }
 
   .next-steps {
-    margin: 32px 0;
+    margin: var(--sp-8) 0;
   }
 
   .next-step-card {
     display: block;
-    background: var(--bg-secondary);
+    background: var(--bg-subtle);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 24px;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    padding: var(--sp-6);
+    transition: border-color var(--duration) var(--ease);
   }
 
   .next-step-card:hover {
-    border-color: var(--accent);
+    border-color: var(--fg-muted);
     text-decoration: none;
   }
 
   .next-step-label {
-    font-size: 12px;
-    color: var(--accent);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
-  .next-step-card h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 4px 0 8px;
+  .next-step-card .doc-h3 {
+    color: var(--fg);
+    margin-top: var(--sp-1);
+    margin-bottom: var(--sp-2);
   }
 
-  .next-step-card p {
-    font-size: 14px;
+  .next-step-card .doc-p {
+    font-size: var(--text-sm);
     margin-bottom: 0;
   }
 
+  /* Page nav */
   .page-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 64px;
-    padding-top: 24px;
+    margin-top: var(--sp-16);
+    padding-top: var(--sp-6);
     border-top: 1px solid var(--border);
   }
 
-  .page-nav-next {
+  .page-nav a {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    gap: var(--sp-2);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    padding: var(--sp-2) var(--sp-4);
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
   }
 
-  .page-nav-next:hover {
-    border-color: var(--accent);
-    color: var(--text-primary);
-    text-decoration: none;
-  }
+  .page-nav a:hover { color: var(--fg); border-color: var(--border-hover); }
 
-  @media (max-width: 1024px) {
-    .docs-page {
-      padding: 32px 24px;
-    }
+  @media (max-width: 960px) {
+    .doc-page { padding: var(--sp-8) var(--sp-5); }
   }
 
   @media (max-width: 640px) {
-    .principles-grid {
-      grid-template-columns: 1fr;
-    }
+    .principles-grid { grid-template-columns: 1fr; }
   }
 </style>

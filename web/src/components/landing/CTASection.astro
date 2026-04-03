@@ -1,81 +1,100 @@
-<section class="section cta-section">
-  <div class="container">
-    <div class="cta-card fade-in">
-      <h2 class="cta-title">Build faster layouts.<br />Ship smoother UIs.</h2>
-      <p class="cta-sub">Join developers who've replaced layout jank with deterministic performance.</p>
-      <div class="cta-buttons">
-        <a href="/docs" class="btn-primary btn-lg">Read the Docs</a>
-        <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener" class="btn-secondary btn-lg">
-          Star on GitHub
-        </a>
+<section class="cta-sect">
+  <div class="wrap">
+    <div class="cta-box" data-reveal>
+      <p class="cta-kicker">Start building</p>
+      <h2 class="cta-h">Deterministic layouts.<br />No guesswork.</h2>
+      <p class="cta-sub">Drop inval into any project. Zero config, zero dependencies.</p>
+      <div class="cta-actions">
+        <a href="/docs/getting-started" class="btn-solid">Read the docs</a>
+        <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener" class="btn-ghost">View on GitHub</a>
       </div>
+      <p class="cta-install"><code>npm i @blu3ph4ntom/inval</code></p>
     </div>
   </div>
 </section>
 
 <style>
-  .cta-section {
-    padding: var(--space-4xl) 0;
+  .cta-sect {
+    padding: var(--sp-24) 0;
+    border-top: 1px solid var(--border);
   }
-  .cta-card {
-    background: var(--bg-secondary);
+
+  .cta-box {
     border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-3xl) var(--space-2xl);
+    border-radius: var(--radius);
+    padding: var(--sp-16) var(--sp-12);
     text-align: center;
-    position: relative;
-    overflow: hidden;
+    background: var(--bg-subtle);
   }
-  .cta-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 70%);
-    pointer-events: none;
+
+  .cta-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--sp-4);
   }
-  .cta-title {
-    font-family: var(--font-display);
-    font-size: clamp(32px, 5vw, 48px);
+
+  .cta-h {
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-5xl));
     font-weight: 600;
-    line-height: 1.15;
-    margin-bottom: var(--space-md);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    margin-bottom: var(--sp-4);
   }
+
   .cta-sub {
-    color: var(--text-secondary);
-    font-size: 18px;
-    max-width: 480px;
-    margin: 0 auto var(--space-xl);
+    font-size: var(--text-lg);
+    color: var(--fg-secondary);
+    margin-bottom: var(--sp-8);
   }
-  .cta-buttons {
+
+  .cta-actions {
     display: flex;
     justify-content: center;
-    gap: var(--space-md);
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-6);
     flex-wrap: wrap;
   }
-  .btn-primary {
-    background: var(--accent);
-    color: var(--bg-primary);
-    padding: 14px 28px;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    font-size: 16px;
-    transition: all var(--transition-base);
-  }
-  .btn-primary:hover {
-    transform: scale(1.02);
-    box-shadow: var(--shadow-glow);
-  }
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    padding: 14px 28px;
-    border-radius: var(--radius-md);
+
+  .btn-solid {
+    font-size: var(--text-sm);
     font-weight: 500;
-    font-size: 16px;
-    transition: all var(--transition-base);
+    color: var(--accent-fg);
+    background: var(--accent);
+    padding: var(--sp-2) var(--sp-5);
+    border-radius: var(--radius-sm);
+    transition: opacity var(--duration) var(--ease);
   }
-  .btn-secondary:hover {
-    border-color: var(--accent);
+
+  .btn-solid:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--fg-secondary);
+    padding: var(--sp-2) var(--sp-5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+  }
+
+  .btn-ghost:hover { color: var(--fg); border-color: var(--border-hover); }
+
+  .cta-install {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+  }
+
+  .cta-install code {
+    font-size: inherit;
+    background: none;
+  }
+
+  @media (max-width: 640px) {
+    .cta-box { padding: var(--sp-12) var(--sp-6); }
+    .cta-h br { display: none; }
   }
 </style>

@@ -4,18 +4,19 @@ export interface Props {
   filename?: string
   lang?: string
 }
-
-const { code, filename, lang = 'typescript' } = Astro.props
+const { code, filename, lang } = Astro.props
 ---
 
-<div class="code-block" x-data="{ copied: false }">
+<div class="codeblock" x-data="{ copied: false }">
   {(filename || lang) && (
-    <div class="code-header">
-      {filename && <span class="code-filename">{filename}</span>}
-      {lang && <span class="code-lang">{lang}</span>}
-      <button class="copy-btn" @click="navigator.clipboard.writeText(code); copied = true; setTimeout(() => copied = false, 2000)">
-        <span x-show="!copied">Copy</span>
-        <span x-show="copied">Copied!</span>
+    <div class="codeblock-bar">
+      {filename && <span class="codeblock-file">{filename}</span>}
+      <button
+        class="codeblock-copy"
+        @click={`navigator.clipboard.writeText(${JSON.stringify(code)}); copied = true; setTimeout(() => copied = false, 2000)`}
+      >
+        <span x-show="!copied">copy</span>
+        <span x-show="copied" style="color:var(--fg)">copied</span>
       </button>
     </div>
   )}
@@ -23,62 +24,54 @@ const { code, filename, lang = 'typescript' } = Astro.props
 </div>
 
 <style>
-  .code-block {
-    background: var(--bg-secondary);
+  .codeblock {
+    background: var(--bg-subtle);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius);
     overflow: hidden;
-    margin: var(--space-lg) 0;
+    margin: var(--sp-5) 0;
   }
 
-  .code-header {
+  .codeblock-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
+    padding: var(--sp-2) var(--sp-4);
     border-bottom: 1px solid var(--border);
-    background: var(--bg-tertiary);
+    background: var(--bg-muted);
   }
 
-  .code-filename {
+  .codeblock-file {
     font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
   }
 
-  .code-lang {
+  .codeblock-copy {
     font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-  }
-
-  .copy-btn {
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
     background: none;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: var(--radius-sm);
+    border: none;
     cursor: pointer;
-    transition: all var(--transition-fast);
-    font-family: var(--font-sans);
+    padding: 0;
+    transition: color var(--duration) var(--ease);
   }
 
-  .copy-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
+  .codeblock-copy:hover { color: var(--fg-secondary); }
 
-  .code-block pre {
-    padding: 20px;
+  .codeblock pre {
+    padding: var(--sp-5);
     overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
   }
 
-  .code-block code {
+  .codeblock code {
     font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.7;
-    color: var(--text-primary);
+    font-size: var(--text-xs);
+    line-height: 1.8;
+    color: var(--fg-secondary);
+    white-space: pre;
   }
 </style>

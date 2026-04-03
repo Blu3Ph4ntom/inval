@@ -2,22 +2,11 @@
 export interface Props {
   currentPage: string
 }
-
 const { currentPage } = Astro.props
 
-interface NavItem {
-  label: string
-  href: string
-}
-
-interface NavSection {
-  title: string
-  items: NavItem[]
-}
-
-const sections: NavSection[] = [
+const nav = [
   {
-    title: 'Getting Started',
+    group: 'Getting Started',
     items: [
       { label: 'Introduction', href: '/docs/' },
       { label: 'Installation', href: '/docs/getting-started#installation' },
@@ -25,18 +14,18 @@ const sections: NavSection[] = [
     ]
   },
   {
-    title: 'Core Concepts',
+    group: 'Core Concepts',
     items: [
       { label: 'Dependency Graphs', href: '/docs/core-concepts#dependency-graphs' },
       { label: 'Input Nodes', href: '/docs/core-concepts#input-nodes' },
       { label: 'Computed Nodes', href: '/docs/core-concepts#computed-nodes' },
-      { label: 'Caching & Dirty State', href: '/docs/core-concepts#caching' },
+      { label: 'Caching & Dirty', href: '/docs/core-concepts#caching' },
       { label: 'Batch Updates', href: '/docs/core-concepts#batch' },
       { label: 'Lifecycle', href: '/docs/core-concepts#lifecycle' },
     ]
   },
   {
-    title: 'API Reference',
+    group: 'API Reference',
     items: [
       { label: 'input()', href: '/docs/api-reference#input' },
       { label: 'node()', href: '/docs/api-reference#node' },
@@ -49,7 +38,7 @@ const sections: NavSection[] = [
     ]
   },
   {
-    title: 'Guides',
+    group: 'Guides',
     items: [
       { label: 'Virtualized Lists', href: '/docs/guides/virtualized-lists' },
       { label: 'Dashboards', href: '/docs/guides/dashboards' },
@@ -58,47 +47,34 @@ const sections: NavSection[] = [
     ]
   },
   {
-    title: 'Examples',
+    group: 'Examples',
     items: [
       { label: 'Overview', href: '/docs/examples/' },
-      { label: 'Basic Calculator', href: '/docs/examples/#calculator' },
-      { label: 'Variable-Height List', href: '/docs/examples/#list' },
-      { label: 'Dashboard', href: '/docs/examples/#dashboard' },
     ]
   },
 ]
 
-function isActive(href: string, current: string): boolean {
-  if (href === current) return true
-  if (href !== '/' && current.startsWith(href)) return true
-  return false
+function active(href: string) {
+  return currentPage === href || (href !== '/docs/' && currentPage.startsWith(href.split('#')[0]))
 }
 ---
 
-<nav class="docs-nav" x-data="{ openSections: {} }">
-  <a href="/" class="docs-nav-logo">
-    <span class="logo-text">inval</span>
-    <span class="logo-version">v0.1.1</span>
+<div class="sidebar">
+  <a href="/" class="sidebar-logo">
+    <span class="sidebar-logo-word">inval</span>
+    <span class="sidebar-logo-ver">v0.1.1</span>
   </a>
 
-  <div class="docs-nav-search">
-    <input type="text" placeholder="Search docs..." x-ref="searchInput" @input.debounce.300ms="$dispatch('docs-search', $event.target.value)" />
-  </div>
-
-  {sections.map((section) => {
-    const defaultOpen = section.items.some(item => isActive(item.href, currentPage))
-    return (
-      <div class="nav-section" x-data={{ open: defaultOpen }}>
-        <button class="nav-section-toggle" @click="open = !open" aria-expanded={defaultOpen}>
-          <span>{section.title}</span>
-          <span class="nav-chevron" :class="{ open }">›</span>
-        </button>
-        <ul class="nav-items" x-show="open">
-          {section.items.map((item) => (
+  <nav class="sidebar-nav">
+    {nav.map(section => (
+      <div class="sidebar-group">
+        <p class="sidebar-group-label">{section.group}</p>
+        <ul class="sidebar-items">
+          {section.items.map(item => (
             <li>
               <a
                 href={item.href}
-                class:active={isActive(item.href, currentPage)}
+                class:list={['sidebar-link', { 'is-active': active(item.href) }]}
               >
                 {item.label}
               </a>
@@ -106,121 +82,87 @@ function isActive(href: string, current: string): boolean {
           ))}
         </ul>
       </div>
-    )
-  })}
-</nav>
+    ))}
+  </nav>
+</div>
 
 <style>
-  .docs-nav {
+  .sidebar {
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--sp-6);
   }
 
-  .docs-nav-logo {
+  .sidebar-logo {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
-    padding-bottom: var(--space-md);
+    gap: var(--sp-2);
+    padding-bottom: var(--sp-4);
     border-bottom: 1px solid var(--border);
   }
 
-  .logo-text {
+  .sidebar-logo-word {
     font-family: var(--font-mono);
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--accent);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--fg);
+    letter-spacing: -0.02em;
   }
 
-  .logo-version {
+  .sidebar-logo-ver {
     font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    background: var(--bg-tertiary);
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    background: var(--bg-muted);
+    padding: 1px 6px;
+    border-radius: 4px;
   }
 
-  .docs-nav-search {
-    margin-bottom: var(--space-md);
-  }
-
-  .docs-nav-search input {
-    width: 100%;
-    padding: 8px 12px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
-    font-family: var(--font-sans);
-    font-size: 13px;
-    outline: none;
-    transition: border-color var(--transition-fast);
-  }
-
-  .docs-nav-search input::placeholder {
-    color: var(--text-muted);
-  }
-
-  .docs-nav-search input:focus {
-    border-color: var(--accent);
-  }
-
-  .nav-section {
+  .sidebar-nav {
     display: flex;
     flex-direction: column;
+    gap: var(--sp-6);
   }
 
-  .nav-section-toggle {
+  .sidebar-group {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 600;
-    padding: var(--space-sm) 0;
-    cursor: pointer;
-    text-align: left;
+    flex-direction: column;
+    gap: var(--sp-1);
   }
 
-  .nav-chevron {
-    display: inline-block;
-    transition: transform var(--transition-fast);
-    color: var(--text-muted);
+  .sidebar-group-label {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: var(--sp-1) var(--sp-2);
+    margin-bottom: var(--sp-1);
   }
 
-  .nav-chevron.open {
-    transform: rotate(90deg);
-  }
-
-  .nav-items {
+  .sidebar-items {
     list-style: none;
-    padding-left: var(--space-md);
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
   }
 
-  .nav-items a {
+  .sidebar-link {
     display: block;
-    padding: 4px 8px;
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+    padding: var(--sp-1) var(--sp-2);
     border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
+    transition: color var(--duration) var(--ease), background var(--duration) var(--ease);
   }
 
-  .nav-items a:hover {
-    color: var(--text-primary);
-    background: var(--bg-tertiary);
-    text-decoration: none;
+  .sidebar-link:hover {
+    color: var(--fg);
+    background: var(--bg-muted);
   }
 
-  .nav-items a.active {
-    color: var(--accent);
-    background: var(--accent-glow);
+  .sidebar-link.is-active {
+    color: var(--fg);
+    background: var(--bg-elevated);
   }
 </style>

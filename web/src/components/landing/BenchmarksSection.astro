@@ -1,130 +1,115 @@
-<section class="section benchmarks-section" id="benchmarks">
-  <div class="container">
-    <div class="section-header fade-in">
-      <span class="section-tag">// Performance</span>
-      <h2 class="section-title">Numbers don't lie.<br /><span class="text-muted">Measured in millions of ops/sec.</span></h2>
-    </div>
-    
-    <div class="bench-grid stagger">
-      <div class="bench-card fade-in">
-        <span class="bench-label">input.get() cached</span>
-        <span class="bench-value">34.6M</span>
-        <span class="bench-unit">ops/s</span>
+<section class="sect" id="benchmarks">
+  <div class="wrap">
+
+    <p class="sect-eyebrow" data-reveal>Performance</p>
+    <h2 class="sect-heading" data-reveal>Measured in millions<br />of operations per second.</h2>
+
+    <div class="bench-table" data-stagger>
+      <div class="bench-row bench-row--head">
+        <span>Operation</span>
+        <span>Throughput</span>
       </div>
-      
-      <div class="bench-card fade-in">
-        <span class="bench-label">computed.get() cached</span>
-        <span class="bench-value">44.3M</span>
-        <span class="bench-unit">ops/s</span>
+      <div class="bench-row">
+        <span class="bench-op">input.get() — cached</span>
+        <span class="bench-val">34.6 M ops/s</span>
       </div>
-      
-      <div class="bench-card fade-in">
-        <span class="bench-label">input.set() + get() cycle</span>
-        <span class="bench-value">1.9M</span>
-        <span class="bench-unit">ops/s</span>
+      <div class="bench-row">
+        <span class="bench-op">node.get() — cached</span>
+        <span class="bench-val">44.3 M ops/s</span>
       </div>
-      
-      <div class="bench-card fade-in">
-        <span class="bench-label">chain depth 10: set+get</span>
-        <span class="bench-value">503K</span>
-        <span class="bench-unit">ops/s</span>
+      <div class="bench-row">
+        <span class="bench-op">input.set() + node.get()</span>
+        <span class="bench-val">1.9 M ops/s</span>
       </div>
-      
-      <div class="bench-card fade-in">
-        <span class="bench-label">diamond (1→4→1): set+get</span>
-        <span class="bench-value">1.5M</span>
-        <span class="bench-unit">ops/s</span>
+      <div class="bench-row">
+        <span class="bench-op">chain depth 10 — set + get</span>
+        <span class="bench-val">503 K ops/s</span>
       </div>
-      
-      <div class="bench-card fade-in">
-        <span class="bench-label">100 chains: set 1, get 1</span>
-        <span class="bench-value">3.7M</span>
-        <span class="bench-unit">ops/s</span>
+      <div class="bench-row">
+        <span class="bench-op">diamond (1 → 4 → 1) — set + get</span>
+        <span class="bench-val">1.5 M ops/s</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-op">100 independent chains — set 1, get 1</span>
+        <span class="bench-val">3.7 M ops/s</span>
       </div>
     </div>
-    
-    <div class="bench-highlight fade-in">
-      <div class="highlight-card">
-        <span class="highlight-number">10×</span>
-        <span class="highlight-text">faster than naive approach on 50 widgets</span>
-      </div>
-    </div>
+
+    <p class="bench-note" data-reveal>
+      Versus a naive approach on 50 widgets with one width change:
+      <strong>417 K vs 4.23 M ops/s — 10× faster.</strong>
+    </p>
+
   </div>
 </section>
 
 <style>
-  .benchmarks-section {
-    padding: var(--space-4xl) 0;
+  .sect {
+    padding: var(--sp-24) 0;
+    border-top: 1px solid var(--border);
   }
-  .bench-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-  }
-  .bench-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    text-align: center;
-    transition: all var(--transition-base);
-  }
-  .bench-card:hover {
-    border-color: var(--accent);
-  }
-  .bench-label {
-    display: block;
-    color: var(--text-secondary);
-    font-size: 13px;
-    margin-bottom: var(--space-sm);
-  }
-  .bench-value {
-    display: block;
-    font-family: var(--font-display);
-    font-size: clamp(28px, 4vw, 40px);
-    font-weight: 700;
-    color: var(--accent);
-  }
-  .bench-unit {
-    display: block;
-    color: var(--text-muted);
-    font-size: 12px;
+
+  .sect-eyebrow {
     font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--sp-4);
   }
-  .bench-highlight {
-    margin-top: var(--space-2xl);
-    text-align: center;
+
+  .sect-heading {
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-3xl));
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-12);
   }
-  .highlight-card {
-    display: inline-flex;
+
+  .bench-table {
+    border-top: 1px solid var(--border);
+    margin-bottom: var(--sp-8);
+  }
+
+  .bench-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: var(--space-lg);
-    background: var(--bg-secondary);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg) var(--space-2xl);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--border);
   }
-  .highlight-number {
-    font-family: var(--font-display);
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--accent);
+
+  .bench-row--head {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
-  .highlight-text {
-    color: var(--text-secondary);
-    font-size: 16px;
+
+  .bench-op {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-secondary);
   }
-  @media (max-width: 1024px) {
-    .bench-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+
+  .bench-val {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--fg);
+    font-weight: 500;
   }
-  @media (max-width: 640px) {
-    .bench-grid {
-      grid-template-columns: 1fr;
-    }
-    .highlight-card {
-      flex-direction: column;
-    }
+
+  .bench-note {
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+    line-height: 1.55;
+  }
+
+  .bench-note strong { color: var(--fg); font-weight: 500; }
+
+  @media (max-width: 540px) {
+    .bench-row { flex-direction: column; align-items: flex-start; gap: var(--sp-1); }
+    .bench-val { color: var(--fg-secondary); }
   }
 </style>

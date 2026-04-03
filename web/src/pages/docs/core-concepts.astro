@@ -10,21 +10,21 @@ const currentPage = '/docs/core-concepts'
 <DocsLayout title="Core Concepts — Inval Docs" description="Understand dependency graphs, input nodes, computed nodes, caching, and batch updates.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
 
-  <div class="docs-page">
+  <div class="doc-page">
     <nav class="breadcrumb">
       <a href="/docs/">Docs</a>
-      <span>/</span>
+      <span class="bc-sep">/</span>
       <span>Core Concepts</span>
     </nav>
 
-    <h1>Core Concepts</h1>
-    <p class="lead">Understand how Inval models computation as a dependency graph.</p>
+    <h1 class="doc-h1">Core Concepts</h1>
+    <p class="doc-lead">Understand how Inval models computation as a dependency graph.</p>
 
     <section id="dependency-graphs">
-      <h2>Dependency Graphs</h2>
-      <p>Inval models all computation as a <strong>Directed Acyclic Graph (DAG)</strong>. Each node is either an input (leaf) or a computed value (internal node).</p>
-      <p>The graph has these properties:</p>
-      <ul>
+      <h2 class="doc-h2">Dependency Graphs</h2>
+      <p class="doc-p">Inval models all computation as a <strong>Directed Acyclic Graph (DAG)</strong>. Each node is either an input (leaf) or a computed value (internal node).</p>
+      <p class="doc-p">The graph has these properties:</p>
+      <ul class="doc-ul">
         <li><strong>Directed</strong> — edges go from dependencies to dependents</li>
         <li><strong>Acyclic</strong> — no cycles allowed; detected at construction time</li>
         <li><strong>Lazy</strong> — computed nodes only evaluate when accessed</li>
@@ -37,8 +37,8 @@ const currentPage = '/docs/core-concepts'
     </section>
 
     <section id="input-nodes">
-      <h2>Input Nodes</h2>
-      <p>Input nodes are leaf nodes in the graph. They hold values set by external code.</p>
+      <h2 class="doc-h2">Input Nodes</h2>
+      <p class="doc-p">Input nodes are leaf nodes in the graph. They hold values set by external code.</p>
 
       <CodeBlock 
         filename="inputs.ts"
@@ -66,19 +66,19 @@ width.inspect()   // { id, name, value, type: 'input' }
 width.dispose()`}
       />
 
-      <h3>Key Properties</h3>
-      <ul>
-        <li><code>get()</code> — returns current value (always fresh)</li>
-        <li><code>set(value)</code> — updates value and marks dependents dirty</li>
-        <li><code>invalidate()</code> — forces invalidation of dependents</li>
-        <li><code>isDirty()</code> — always returns false for inputs</li>
-        <li><code>dispose()</code> — removes from dependency graph</li>
+      <h3 class="doc-h3">Key Properties</h3>
+      <ul class="doc-ul">
+        <li><code class="doc-code">get()</code> — returns current value (always fresh)</li>
+        <li><code class="doc-code">set(value)</code> — updates value and marks dependents dirty</li>
+        <li><code class="doc-code">invalidate()</code> — forces invalidation of dependents</li>
+        <li><code class="doc-code">isDirty()</code> — always returns false for inputs</li>
+        <li><code class="doc-code">dispose()</code> — removes from dependency graph</li>
       </ul>
     </section>
 
     <section id="computed-nodes">
-      <h2>Computed Nodes</h2>
-      <p>Computed nodes declare their dependencies and compute lazily. They cache their result and only recompute when a dependency changes.</p>
+      <h2 class="doc-h2">Computed Nodes</h2>
+      <p class="doc-p">Computed nodes declare their dependencies and compute lazily. They cache their result and only recompute when a dependency changes.</p>
 
       <CodeBlock 
         filename="computed.ts"
@@ -113,22 +113,22 @@ area.invalidate()
 area.dispose()`}
       />
 
-      <h3>Key Properties</h3>
-      <ul>
-        <li><code>get()</code> — returns cached value or recomputes if dirty</li>
-        <li><code>isDirty()</code> — true if any dependency changed</li>
-        <li><code>invalidate()</code> — forces recompute on next get()</li>
-        <li><code>dispose()</code> — removes from dependency graph</li>
+      <h3 class="doc-h3">Key Properties</h3>
+      <ul class="doc-ul">
+        <li><code class="doc-code">get()</code> — returns cached value or recomputes if dirty</li>
+        <li><code class="doc-code">isDirty()</code> — true if any dependency changed</li>
+        <li><code class="doc-code">invalidate()</code> — forces recompute on next get()</li>
+        <li><code class="doc-code">dispose()</code> — removes from dependency graph</li>
       </ul>
 
       <Callout type="tip">
-        <p>The <code>dependsOn</code> object maps names to nodes. The <code>compute</code> function receives an object with the same keys, resolved to their current values.</p>
+        <p>The <code class="doc-code">dependsOn</code> object maps names to nodes. The <code class="doc-code">compute</code> function receives an object with the same keys, resolved to their current values.</p>
       </Callout>
     </section>
 
     <section id="caching">
-      <h2>Caching & Dirty State</h2>
-      <p>Every computed node maintains a <strong>dirty flag</strong>. When an input changes, it walks the graph and marks all downstream nodes dirty. But they don't recompute immediately — they wait until <code>get()</code> is called.</p>
+      <h2 class="doc-h2">Caching & Dirty State</h2>
+      <p class="doc-p">Every computed node maintains a <strong>dirty flag</strong>. When an input changes, it walks the graph and marks all downstream nodes dirty. But they don't recompute immediately — they wait until <code class="doc-code">get()</code> is called.</p>
 
       <CodeBlock 
         filename="caching.ts"
@@ -153,12 +153,12 @@ a.set(15)
 sum.get()    // "computing..." → 35 (recomputed)`}
       />
 
-      <p>This lazy evaluation means you pay zero cost for unused computations. Only nodes you actually read get recomputed.</p>
+      <p class="doc-p">This lazy evaluation means you pay zero cost for unused computations. Only nodes you actually read get recomputed.</p>
     </section>
 
     <section id="batch">
-      <h2>Batch Updates</h2>
-      <p>When you need to change multiple inputs at once, use <code>batch()</code> to ensure atomic updates.</p>
+      <h2 class="doc-h2">Batch Updates</h2>
+      <p class="doc-p">When you need to change multiple inputs at once, use <code class="doc-code">batch()</code> to ensure atomic updates.</p>
 
       <CodeBlock 
         filename="batch.ts"
@@ -187,52 +187,52 @@ sum.get()   // recomputes once`}
       />
 
       <Callout type="warning">
-        <p>Always use <code>batch()</code> when setting multiple inputs. Without it, each <code>set()</code> triggers a separate invalidation walk.</p>
+        <p>Always use <code class="doc-code">batch()</code> when setting multiple inputs. Without it, each <code class="doc-code">set()</code> triggers a separate invalidation walk.</p>
       </Callout>
     </section>
 
     <section id="lifecycle">
-      <h2>Lifecycle</h2>
-      <p>Nodes have a simple lifecycle:</p>
+      <h2 class="doc-h2">Lifecycle</h2>
+      <p class="doc-p">Nodes have a simple lifecycle:</p>
 
       <div class="lifecycle-steps">
         <div class="lifecycle-step">
           <span class="step-num">1</span>
           <div>
             <h4>Create</h4>
-            <p>Call <code>input()</code> or <code>node()</code>. Edges are registered. Cycles detected.</p>
+            <p class="doc-p">Call <code class="doc-code">input()</code> or <code class="doc-code">node()</code>. Edges are registered. Cycles detected.</p>
           </div>
         </div>
         <div class="lifecycle-step">
           <span class="step-num">2</span>
           <div>
             <h4>Access</h4>
-            <p>Call <code>get()</code>. Computed nodes evaluate if dirty, return cached otherwise.</p>
+            <p class="doc-p">Call <code class="doc-code">get()</code>. Computed nodes evaluate if dirty, return cached otherwise.</p>
           </div>
         </div>
         <div class="lifecycle-step">
           <span class="step-num">3</span>
           <div>
             <h4>Update</h4>
-            <p>Call <code>set()</code> on inputs. Downstream nodes marked dirty. No recomputation yet.</p>
+            <p class="doc-p">Call <code class="doc-code">set()</code> on inputs. Downstream nodes marked dirty. No recomputation yet.</p>
           </div>
         </div>
         <div class="lifecycle-step">
           <span class="step-num">4</span>
           <div>
             <h4>Dispose</h4>
-            <p>Call <code>dispose()</code> to remove from graph and free references.</p>
+            <p class="doc-p">Call <code class="doc-code">dispose()</code> to remove from graph and free references.</p>
           </div>
         </div>
       </div>
     </section>
 
     <div class="page-nav">
-      <a href="/docs/getting-started" class="page-nav-prev">
+      <a href="/docs/getting-started">
         <span>←</span>
         <span>Getting Started</span>
       </a>
-      <a href="/docs/api-reference" class="page-nav-next">
+      <a href="/docs/api-reference">
         <span>API Reference</span>
         <span>→</span>
       </a>
@@ -241,103 +241,123 @@ sum.get()   // recomputes once`}
 </DocsLayout>
 
 <style>
-  .docs-page {
-    padding: 48px 64px;
-    max-width: 800px;
+  .doc-page {
+    max-width: 680px;
+    padding: var(--sp-12) var(--sp-10);
   }
 
   .breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    margin-bottom: var(--sp-8);
   }
 
-  .breadcrumb a { color: var(--text-secondary); }
-  .breadcrumb span:last-child { color: var(--text-primary); }
+  .breadcrumb a { color: var(--fg-muted); transition: color var(--duration) var(--ease); }
+  .breadcrumb a:hover { color: var(--fg-secondary); }
+  .bc-sep { color: var(--fg-muted); opacity: 0.4; }
 
-  h1 {
-    font-family: var(--font-display);
-    font-size: 40px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .lead {
-    font-size: 18px;
-    color: var(--text-secondary);
-    margin-bottom: 48px;
-  }
-
-  h2 {
-    font-family: var(--font-display);
-    font-size: 28px;
+  .doc-h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
     font-weight: 600;
-    margin-top: 48px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-3);
   }
 
-  h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-top: 32px;
-    margin-bottom: 12px;
+  .doc-lead {
+    font-size: var(--text-lg);
+    color: var(--fg-secondary);
+    margin-bottom: var(--sp-10);
+    line-height: 1.65;
   }
+
+  .doc-h2 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-top: var(--sp-12);
+    margin-bottom: var(--sp-4);
+    padding-top: var(--sp-12);
+    border-top: 1px solid var(--border);
+  }
+
+  .doc-h2:first-of-type { margin-top: var(--sp-8); padding-top: 0; border-top: none; }
+
+  .doc-h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-3);
+  }
+
+  .doc-p {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--sp-4);
+  }
+
+  .doc-ul {
+    list-style: none;
+    margin-bottom: var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .doc-ul li {
+    font-size: var(--text-base);
+    color: var(--fg-secondary);
+    line-height: 1.6;
+    padding-left: var(--sp-4);
+    position: relative;
+  }
+
+  .doc-ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--fg-muted);
+    font-size: var(--text-xs);
+  }
+
+  .doc-code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    color: var(--fg);
+    background: var(--bg-muted);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  strong { color: var(--fg); font-weight: 500; }
 
   h4 {
-    font-size: 15px;
+    font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-  }
-
-  p {
-    color: var(--text-secondary);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-  }
-
-  ul {
-    color: var(--text-secondary);
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 16px;
-    padding-left: 24px;
-  }
-
-  ul li { margin-bottom: 8px; }
-  strong { color: var(--text-primary); }
-
-  code {
-    font-family: var(--font-mono);
-    font-size: 0.9em;
-    background: var(--bg-tertiary);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: var(--accent);
+    color: var(--fg);
+    margin-bottom: var(--sp-1);
   }
 
   .lifecycle-steps {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin: 24px 0;
+    gap: var(--sp-4);
+    margin: var(--sp-6) 0;
   }
 
   .lifecycle-step {
     display: flex;
-    gap: 16px;
+    gap: var(--sp-4);
     align-items: flex-start;
-    padding: 16px;
-    background: var(--bg-secondary);
+    padding: var(--sp-4);
+    background: var(--bg-subtle);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
   }
 
   .step-num {
@@ -347,47 +367,43 @@ sum.get()   // recomputes once`}
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--accent);
-    color: var(--bg-primary);
+    background: var(--fg-muted);
+    color: var(--bg);
     font-weight: 700;
-    font-size: 14px;
+    font-size: var(--text-sm);
     flex-shrink: 0;
   }
 
-  .lifecycle-step p {
-    font-size: 14px;
+  .lifecycle-step .doc-p {
+    font-size: var(--text-sm);
     margin-bottom: 0;
   }
 
+  /* Page nav */
   .page-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 64px;
-    padding-top: 24px;
+    margin-top: var(--sp-16);
+    padding-top: var(--sp-6);
     border-top: 1px solid var(--border);
   }
 
-  .page-nav-prev,
-  .page-nav-next {
+  .page-nav a {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    gap: var(--sp-2);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+    padding: var(--sp-2) var(--sp-4);
+    transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
   }
 
-  .page-nav-prev:hover,
-  .page-nav-next:hover {
-    border-color: var(--accent);
-    color: var(--text-primary);
-    text-decoration: none;
-  }
+  .page-nav a:hover { color: var(--fg); border-color: var(--border-hover); }
 
-  @media (max-width: 1024px) {
-    .docs-page { padding: 32px 24px; }
+  @media (max-width: 960px) {
+    .doc-page { padding: var(--sp-8) var(--sp-5); }
   }
 </style>

@@ -1,133 +1,130 @@
----
----
+<section class="sect" id="use-cases">
+  <div class="wrap">
 
-<section class="section use-cases-section" id="use-cases">
-  <div class="container">
-    <div class="section-header fade-in">
-      <span class="section-tag">// Use Cases</span>
-      <h2 class="section-title">Where Inval shines.<br /><span class="text-muted">Real-world applications.</span></h2>
-    </div>
-    
-    <div class="use-cases-grid stagger" x-data="{ active: null }">
-      <template x-for="useCase in [
-        { name: 'Virtualized Lists', desc: 'Variable-height rows with O(1) scroll updates. Only visible range recomputes.', icon: '📋' },
-        { name: 'Dashboards', desc: 'Resizable panels with dependent widgets. Change one width, cascade intelligently.', icon: '📊' },
-        { name: 'Kanban Boards', desc: 'Column widths, card heights, scroll positions — all tracked as a dependency graph.', icon: '📌' },
-        { name: 'Data Grids', desc: 'Column resizing, row virtualization, and dynamic cell heights without jank.', icon: '📈' },
-        { name: 'Chat UIs', desc: 'Message bubbles with dynamic heights. Scroll position preserved on new messages.', icon: '💬' },
-        { name: 'Whiteboards', desc: 'Canvas elements with positional dependencies. Zoom and pan without full redraw.', icon: '🎨' },
-        { name: 'Node Editors', desc: 'Connected nodes with computed positions. Drag one, update dependents incrementally.', icon: '🔗' },
-        { name: 'Timeline Editors', desc: 'Track items with dynamic widths. Scrubbing updates only visible viewport.', icon: '🎬' },
-        { name: 'Responsive Grids', desc: 'Breakpoint-driven layouts. Recompute only affected elements on resize.', icon: '📱' }
-      ]" :key="useCase.name">
-        <div class="use-case-card" :class="{ active: active === useCase.name }" @click="active = active === useCase.name ? null : useCase.name">
-          <div class="use-case-header">
-            <span class="use-case-icon" x-text="useCase.icon"></span>
-            <span class="use-case-name" x-text="useCase.name"></span>
-            <span class="use-case-arrow">→</span>
-          </div>
-          <div class="use-case-desc" x-show="active === useCase.name" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-text="useCase.desc"></div>
+    <p class="sect-eyebrow" data-reveal>Use Cases</p>
+    <h2 class="sect-heading" data-reveal>Where layout complexity lives.</h2>
+
+    <div class="cases" data-stagger x-data="{ active: null }">
+
+      <div class="case" :class="{ 'is-active': active === 0 }" @click="active = active === 0 ? null : 0">
+        <div class="case-row">
+          <p class="case-name">Virtualized lists</p>
+          <span class="case-chevron">+</span>
         </div>
-      </template>
+        <p class="case-detail" x-show="active === 0" x-transition>Variable-height rows with O(1) scroll updates. Width change recalculates row heights. Scroll change recalculates only the visible range — row heights stay cached.</p>
+      </div>
+
+      <div class="case" :class="{ 'is-active': active === 1 }" @click="active = active === 1 ? null : 1">
+        <div class="case-row">
+          <p class="case-name">Resizable dashboards</p>
+          <span class="case-chevron">+</span>
+        </div>
+        <p class="case-detail" x-show="active === 1" x-transition>Drag a panel edge — only downstream widgets recompute their dimensions. Zoom changes hit only zoom-dependent nodes. Sidebar resize hits only width-dependent nodes.</p>
+      </div>
+
+      <div class="case" :class="{ 'is-active': active === 2 }" @click="active = active === 2 ? null : 2">
+        <div class="case-row">
+          <p class="case-name">Data grids</p>
+          <span class="case-chevron">+</span>
+        </div>
+        <p class="case-detail" x-show="active === 2" x-transition>Column resizing, row virtualization, dynamic cell heights — all tracked as a single DAG. Resize column 4, and only the cells and scroll positions downstream update.</p>
+      </div>
+
+      <div class="case" :class="{ 'is-active': active === 3 }" @click="active = active === 3 ? null : 3">
+        <div class="case-row">
+          <p class="case-name">Kanban & card boards</p>
+          <span class="case-chevron">+</span>
+        </div>
+        <p class="case-detail" x-show="active === 3" x-transition>Column widths, card heights, and scroll offsets form a graph. Add a card — only that column's height and offset recalculate. Other columns stay cached.</p>
+      </div>
+
+      <div class="case" :class="{ 'is-active': active === 4 }" @click="active = active === 4 ? null : 4">
+        <div class="case-row">
+          <p class="case-name">Whiteboards & node editors</p>
+          <span class="case-chevron">+</span>
+        </div>
+        <p class="case-detail" x-show="active === 4" x-transition>Drag a node — computed edge paths for only that node recalculate. Pan or zoom — bounding box and viewport transforms update incrementally.</p>
+      </div>
+
+      <div class="case" :class="{ 'is-active': active === 5 }" @click="active = active === 5 ? null : 5">
+        <div class="case-row">
+          <p class="case-name">Chat & feed UIs</p>
+          <span class="case-chevron">+</span>
+        </div>
+        <p class="case-detail" x-show="active === 5" x-transition>Message bubbles have dynamic heights. New messages only recompute from the insertion point down. Scroll lock and anchor positions stay accurate.</p>
+      </div>
+
     </div>
+
   </div>
 </section>
 
 <style>
-  .use-cases-section {
-    padding: var(--space-4xl) 0;
+  .sect {
+    padding: var(--sp-24) 0;
+    border-top: 1px solid var(--border);
   }
 
-  .section-header {
-    text-align: center;
-    margin-bottom: var(--space-3xl);
-  }
-
-  .section-tag {
+  .sect-eyebrow {
     font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--text-muted);
+    font-size: var(--text-xs);
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--sp-4);
   }
 
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(32px, 5vw, 48px);
+  .sect-heading {
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-3xl));
     font-weight: 600;
     line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--sp-12);
   }
 
-  .text-muted {
-    color: var(--text-muted);
-  }
-
-  .use-cases-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-  }
-
-  .use-case-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--rounded-lg);
-    padding: var(--space-lg);
-    cursor: pointer;
-    transition: all var(--transition-base);
-  }
-
-  .use-case-card:hover {
-    border-color: var(--border-hover);
-  }
-
-  .use-case-card.active {
-    border-color: var(--accent);
-    box-shadow: var(--shadow-glow);
-  }
-
-  .use-case-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-  }
-
-  .use-case-icon {
-    font-size: 20px;
-  }
-
-  .use-case-name {
-    font-size: 14px;
-    font-weight: 500;
-    flex: 1;
-  }
-
-  .use-case-arrow {
-    color: var(--text-muted);
-    font-size: 14px;
-    transition: transform var(--transition-fast);
-  }
-
-  .use-case-card.active .use-case-arrow {
-    transform: rotate(90deg);
-  }
-
-  .use-case-desc {
-    color: var(--text-secondary);
-    font-size: 13px;
-    line-height: 1.6;
-    padding-top: var(--space-md);
+  .cases {
     border-top: 1px solid var(--border);
-    margin-top: var(--space-md);
   }
 
-  @media (max-width: 1024px) {
-    .use-cases-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  .case {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    transition: background var(--duration) var(--ease);
   }
 
-  @media (max-width: 640px) {
-    .use-cases-grid {
-      grid-template-columns: 1fr;
-    }
+  .case:hover { background: var(--bg-subtle); }
+  .case.is-active { background: var(--bg-subtle); }
+
+  .case-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--sp-5) var(--sp-4);
+  }
+
+  .case-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  .case-chevron {
+    font-size: var(--text-lg);
+    color: var(--fg-muted);
+    line-height: 1;
+    transition: transform var(--duration) var(--ease), color var(--duration) var(--ease);
+  }
+
+  .case.is-active .case-chevron {
+    transform: rotate(45deg);
+    color: var(--fg-secondary);
+  }
+
+  .case-detail {
+    padding: 0 var(--sp-4) var(--sp-5);
+    font-size: var(--text-sm);
+    color: var(--fg-secondary);
+    line-height: 1.6;
+    max-width: 640px;
   }
 </style>
