@@ -2,6 +2,6 @@ import { defineConfig } from "astro/config";
 
 export default defineConfig({
   output: "static",
-  base: "/inval/",
+  base: "/",
   server: { port: 4322, host: true },
 });
