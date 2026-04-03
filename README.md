@@ -1,4 +1,4 @@
-# Layout invalidation, solved. <img src="web/public/logo-readme.svg" align="right" alt="Inval" width="35%"/>
+# Layout invalidation, solved. <img src="web/public/logo-readme.svg" align="right" alt="Inval" width="30%"/>
 
 **Deterministic, incremental layout invalidation engine.**
 
