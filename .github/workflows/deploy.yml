@@ -22,7 +22,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - uses: actions/configure-pages@v5
       - run: cd web && bun install
-      - run: cd web && bun run build
+      - run: cd web && bunx astro build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist
