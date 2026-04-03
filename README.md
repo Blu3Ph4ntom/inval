@@ -1,4 +1,4 @@
-# @blu3ph4ntom/inval
+# Layout invalidation, solved. <img src="web/public/logo.svg" align="right" alt="Inval" width="200"/>
 
 **Deterministic, incremental layout invalidation engine.**
 

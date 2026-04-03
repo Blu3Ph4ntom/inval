@@ -1,14 +1,23 @@
 ---
 import DocsLayout from '../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../components/docs/DocsToc.astro'
 import CodeBlock from '../../components/docs/CodeBlock.astro'
 import Callout from '../../components/docs/Callout.astro'
 
 const currentPage = '/docs/'
+
+const headings = [
+  { id: 'what-is-inval', text: 'What is Inval?', level: 2 },
+  { id: 'why-inval', text: 'Why Inval?', level: 2 },
+  { id: 'how-it-works', text: 'How It Works', level: 2 },
+  { id: 'principles', text: 'Principles', level: 2 },
+]
 ---
 
 <DocsLayout title="Introduction — Inval Docs" description="Learn what Inval is and why you need it.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="doc-page">
     <nav class="breadcrumb">
@@ -45,7 +54,7 @@ const currentPage = '/docs/'
     <section id="quick-example">
       <h2 class="doc-h2">Quick Example</h2>
 
-      <CodeBlock 
+      <CodeBlock
         filename="example.ts"
         lang="typescript"
         code={`import { input, node, why } from '@blu3ph4ntom/inval'
@@ -208,11 +217,20 @@ why(area)         // ['area', 'width'] — trace invalidation path`}
 
   .doc-code {
     font-family: var(--font-mono);
-    font-size: 0.88em;
+    font-size: 0.86em;
     color: var(--fg);
     background: var(--bg-muted);
-    padding: 1px 6px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-weight: 450;
+    letter-spacing: 0.01em;
+    transition: all var(--duration) var(--ease);
+  }
+
+  .doc-code:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-hover);
   }
 
   strong { color: var(--fg); font-weight: 500; }

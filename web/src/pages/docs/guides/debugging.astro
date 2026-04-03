@@ -1,14 +1,22 @@
 ---
 import DocsLayout from '../../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../../components/docs/DocsToc.astro'
 import CodeBlock from '../../../components/docs/CodeBlock.astro'
 import Callout from '../../../components/docs/Callout.astro'
 
 const currentPage = '/docs/guides/debugging'
+
+const headings = [
+  { id: 'why', text: 'why()', level: 2 },
+  { id: 'inspect', text: 'inspect()', level: 2 },
+  { id: 'todot', text: 'toDot()', level: 2 },
+]
 ---
 
 <DocsLayout title="Debugging — Inval Guides" description="Debug performance issues with why(), inspect(), and toDot().">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="docs-page">
     <nav class="breadcrumb">
@@ -26,7 +34,7 @@ const currentPage = '/docs/guides/debugging'
       <h2>Tracing with why()</h2>
       <p>When a node recomputes unexpectedly, use <code>why()</code> to trace the invalidation path back to the source.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="debug-why.ts"
         lang="typescript"
         code={`import { input, node, why } from '@blu3ph4ntom/inval'
@@ -49,7 +57,7 @@ why(area)  // ['area', 'width']
       <h2>Inspecting Nodes</h2>
       <p>Use <code>inspect()</code> to see a node's current state, dirty flag, and connection count.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="debug-inspect.ts"
         lang="typescript"
         code={`const info = area.inspect()
@@ -69,7 +77,7 @@ why(area)  // ['area', 'width']
       <h2>Visualizing with toDot()</h2>
       <p>Export your graph as Graphviz DOT format and visualize it online.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="debug-dot.ts"
         lang="typescript"
         code={`import { input, node, toDot } from '@blu3ph4ntom/inval'
@@ -92,7 +100,7 @@ console.log(toDot([c]))
       <h2>Monitoring with stats()</h2>
       <p>Track graph size and compute calls to monitor performance.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="debug-stats.ts"
         lang="typescript"
         code={`import { stats } from '@blu3ph4ntom/inval'

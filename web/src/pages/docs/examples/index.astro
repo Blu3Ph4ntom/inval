@@ -1,14 +1,22 @@
 ---
 import DocsLayout from '../../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../../components/docs/DocsToc.astro'
 import CodeBlock from '../../../components/docs/CodeBlock.astro'
 import Callout from '../../../components/docs/Callout.astro'
 
 const currentPage = '/docs/examples/'
+
+const headings = [
+  { id: 'counter', text: 'Counter', level: 2 },
+  { id: 'todo-list', text: 'Todo List', level: 2 },
+  { id: 'spreadsheet', text: 'Spreadsheet', level: 2 },
+]
 ---
 
 <DocsLayout title="Examples — Inval Docs" description="Real-world examples of Inval in action.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="docs-page">
     <nav class="breadcrumb">
@@ -24,7 +32,7 @@ const currentPage = '/docs/examples/'
       <h2>Basic Calculator</h2>
       <p>A simple dependency chain: two inputs, one computed result.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="calculator.ts"
         lang="typescript"
         code={`import { input, node } from '@blu3ph4ntom/inval'
@@ -62,7 +70,7 @@ average.get()  // 35 (recomputed)`}
       <h2>Variable-Height Virtualized List</h2>
       <p>Full virtualized list with dynamic row heights. Only visible range recomputes on scroll.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="virtualized-list.ts"
         lang="typescript"
         code={`import { input, node } from '@blu3ph4ntom/inval'
@@ -120,7 +128,7 @@ visibleRange.isDirty() // true`}
       <h2>Dashboard with Widgets</h2>
       <p>Multi-widget layout with dependent dimensions. Sidebar resize cascades intelligently.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="dashboard.ts"
         lang="typescript"
         code={`import { input, node, batch } from '@blu3ph4ntom/inval'
@@ -180,7 +188,7 @@ tableWidth.isDirty()     // false`}
       <h2>Kanban Board</h2>
       <p>Column widths, card heights, and scroll positions tracked as a dependency graph.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="kanban.ts"
         lang="typescript"
         code={`import { input, node, batch } from '@blu3ph4ntom/inval'

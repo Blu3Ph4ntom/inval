@@ -8,7 +8,22 @@
         <a href="/docs/getting-started" class="btn-solid">Read the docs</a>
         <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener" class="btn-ghost">View on GitHub</a>
       </div>
-      <p class="cta-install"><code>npm i @blu3ph4ntom/inval</code></p>
+      <p class="cta-install" x-data="{ copied: false }">
+        <code>npm i @blu3ph4ntom/inval</code>
+        <button
+          class="cta-copy"
+          @click="navigator.clipboard.writeText('npm i @blu3ph4ntom/inval').then(() => { copied = true; setTimeout(() => copied = false, 2000); })"
+          aria-label="Copy install command"
+        >
+          <svg x-show="!copied" class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <svg x-show="copied" class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+      </p>
     </div>
   </div>
 </section>
@@ -86,11 +101,38 @@
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--fg-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .cta-install code {
     font-size: inherit;
     background: none;
+  }
+
+  .cta-copy {
+    color: var(--fg-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 150ms var(--ease);
+  }
+
+  .cta-copy:hover {
+    color: var(--fg-secondary);
+  }
+
+  .cta-copy:active {
+    color: var(--green);
+  }
+
+  .copy-icon {
+    width: 12px;
+    height: 12px;
   }
 
   @media (max-width: 640px) {

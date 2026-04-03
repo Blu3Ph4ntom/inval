@@ -1,14 +1,27 @@
 ---
 import DocsLayout from '../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../components/docs/DocsToc.astro'
 import CodeBlock from '../../components/docs/CodeBlock.astro'
 import Callout from '../../components/docs/Callout.astro'
 
 const currentPage = '/docs/api-reference'
+
+const headings = [
+  { id: 'input', text: 'input()', level: 2 },
+  { id: 'node', text: 'node()', level: 2 },
+  { id: 'batch', text: 'batch()', level: 2 },
+  { id: 'why', text: 'why()', level: 2 },
+  { id: 'ancestors-descendants', text: 'ancestors() / descendants()', level: 2 },
+  { id: 'todot', text: 'toDot()', level: 2 },
+  { id: 'stats', text: 'stats()', level: 2 },
+  { id: 'types', text: 'TypeScript Types', level: 2 },
+]
 ---
 
 <DocsLayout title="API Reference — Inval Docs" description="Complete API reference for all Inval functions and types.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="doc-page">
     <nav class="breadcrumb">
@@ -25,7 +38,7 @@ const currentPage = '/docs/api-reference'
       <p class="doc-p">Creates a leaf input node. External code sets the value.</p>
 
       <h3 class="doc-h3">Signature</h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`function input<T>(value: T): InputNode<T>`}
       />
@@ -52,7 +65,7 @@ const currentPage = '/docs/api-reference'
       </ul>
 
       <h3 class="doc-h3">Example</h3>
-      <CodeBlock 
+      <CodeBlock
         filename="input-example.ts"
         lang="typescript"
         code={`const width = input(800)
@@ -66,7 +79,7 @@ width.set(600)  // marks dependents dirty`}
       <p class="doc-p">Creates a computed node with declared dependencies. Lazy evaluation, cached results.</p>
 
       <h3 class="doc-h3">Signature</h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`function node<DependsOn extends Record<string, Node<any>>, R>(
   options: {
@@ -98,7 +111,7 @@ width.set(600)  // marks dependents dirty`}
       </ul>
 
       <h3 class="doc-h3">Example</h3>
-      <CodeBlock 
+      <CodeBlock
         filename="node-example.ts"
         lang="typescript"
         code={`const width = input(800)
@@ -125,13 +138,13 @@ area.get()    // 600000 (recomputed)`}
       <p class="doc-p">Executes a function atomically. All input sets within the batch trigger a single invalidation walk. Returns the set of changed nodes.</p>
 
       <h3 class="doc-h3">Signature</h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`function batch<T>(fn: () => T): T | Set<Node<any>>`}
       />
 
       <h3 class="doc-h3">Example</h3>
-      <CodeBlock 
+      <CodeBlock
         filename="batch-example.ts"
         lang="typescript"
         code={`const changed = batch(() => {
@@ -147,13 +160,13 @@ area.get()    // 600000 (recomputed)`}
       <p class="doc-p">Traces the invalidation path for a node. Returns an array of node names from the target back to the source inputs that caused invalidation.</p>
 
       <h3 class="doc-h3">Signature</h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`function why(node: Node<any>): string[]`}
       />
 
       <h3 class="doc-h3">Example</h3>
-      <CodeBlock 
+      <CodeBlock
         filename="why-example.ts"
         lang="typescript"
         code={`const cardHeight = node({
@@ -171,14 +184,14 @@ why(cardHeight) // ['cardHeight', 'textHeight', 'width']`}
       <p class="doc-p">Navigate the dependency graph. <code class="doc-code">ancestors</code> returns all upstream dependencies. <code class="doc-code">descendants</code> returns all downstream dependents.</p>
 
       <h3 class="doc-h3">Signature</h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`function ancestors(node: Node<any>): Set<Node<any>>
 function descendants(node: Node<any>): Set<Node<any>>`}
       />
 
       <h3 class="doc-h3">Example</h3>
-      <CodeBlock 
+      <CodeBlock
         filename="graph-nav.ts"
         lang="typescript"
         code={`const a = input(1)
@@ -195,13 +208,13 @@ descendants(a) // Set { b, c }`}
       <p class="doc-p">Exports the dependency graph as Graphviz DOT format for visualization.</p>
 
       <h3 class="doc-h3">Signature</h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`function toDot(nodes: Node<any>[]): string`}
       />
 
       <h3 class="doc-h3">Example</h3>
-      <CodeBlock 
+      <CodeBlock
         filename="dot-example.ts"
         lang="typescript"
         code={`console.log(toDot([area]))
@@ -219,7 +232,7 @@ descendants(a) // Set { b, c }`}
       <p class="doc-p">Returns statistics about the dependency graph.</p>
 
       <h3 class="doc-h3">Signature</h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`function stats(nodes: Node<any[]>): {
   nodeCount: number
@@ -231,7 +244,7 @@ descendants(a) // Set { b, c }`}
       />
 
       <h3 class="doc-h3">Example</h3>
-      <CodeBlock 
+      <CodeBlock
         filename="stats-example.ts"
         lang="typescript"
         code={`stats([root])
@@ -249,7 +262,7 @@ descendants(a) // Set { b, c }`}
       <h2 class="doc-h2">TypeScript Types</h2>
 
       <h3 class="doc-h3"><code class="doc-code">InputNode&lt;T&gt;</code></h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`interface InputNode<T> {
   get(): T
@@ -262,7 +275,7 @@ descendants(a) // Set { b, c }`}
       />
 
       <h3 class="doc-h3"><code class="doc-code">ComputedNode&lt;T&gt;</code></h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`interface ComputedNode<T> {
   get(): T
@@ -274,7 +287,7 @@ descendants(a) // Set { b, c }`}
       />
 
       <h3 class="doc-h3"><code class="doc-code">InspectInfo</code></h3>
-      <CodeBlock 
+      <CodeBlock
         lang="typescript"
         code={`interface InspectInfo {
   id: string
@@ -395,11 +408,20 @@ descendants(a) // Set { b, c }`}
 
   .doc-code {
     font-family: var(--font-mono);
-    font-size: 0.88em;
+    font-size: 0.86em;
     color: var(--fg);
     background: var(--bg-muted);
-    padding: 1px 6px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-weight: 450;
+    letter-spacing: 0.01em;
+    transition: all var(--duration) var(--ease);
+  }
+
+  .doc-code:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-hover);
   }
 
   strong { color: var(--fg); font-weight: 500; }

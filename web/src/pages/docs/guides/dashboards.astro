@@ -1,14 +1,22 @@
 ---
 import DocsLayout from '../../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../../components/docs/DocsToc.astro'
 import CodeBlock from '../../../components/docs/CodeBlock.astro'
 import Callout from '../../../components/docs/Callout.astro'
 
 const currentPage = '/docs/guides/dashboards'
+
+const headings = [
+  { id: 'overview', text: 'Overview', level: 2 },
+  { id: 'layout-graph', text: 'Layout Graph', level: 2 },
+  { id: 'responsive', text: 'Responsive Updates', level: 2 },
+]
 ---
 
 <DocsLayout title="Dashboard Layouts — Inval Guides" description="Build responsive dashboards with dependent widgets.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="docs-page">
     <nav class="breadcrumb">
@@ -30,7 +38,7 @@ const currentPage = '/docs/guides/dashboards'
     <section id="example">
       <h2>Example: Multi-Widget Dashboard</h2>
 
-      <CodeBlock 
+      <CodeBlock
         filename="dashboard.ts"
         lang="typescript"
         code={`import { input, node, batch } from '@blu3ph4ntom/inval'

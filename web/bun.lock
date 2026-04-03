@@ -6,6 +6,7 @@
       "name": "inval-web",
       "dependencies": {
         "astro": "6.1.3",
+        "shiki": "^4.0.2",
       },
     },
   },

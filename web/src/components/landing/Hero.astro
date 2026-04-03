@@ -1,12 +1,25 @@
 <section class="hero">
   <div class="wrap hero-inner">
-    <p class="hero-tag" data-reveal>
+    <p class="hero-tag" data-reveal x-data="{ copied: false }">
       <span class="hero-dot"></span>
       <code>npm i @blu3ph4ntom/inval</code>
+      <button
+        class="hero-copy"
+        @click="navigator.clipboard.writeText('npm i @blu3ph4ntom/inval').then(() => { copied = true; setTimeout(() => copied = false, 2000); })"
+        aria-label="Copy install command"
+      >
+        <svg x-show="!copied" class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg x-show="copied" class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </button>
     </p>
 
     <h1 class="hero-h" data-reveal>
-      Layout invalidation,<br />solved.
+      Layout invalidation, solved.
     </h1>
 
     <p class="hero-sub" data-reveal>
@@ -46,6 +59,12 @@
     align-items: center;
   }
 
+  .hero-logo {
+    width: 180px;
+    height: auto;
+    margin-bottom: var(--sp-8);
+  }
+
   .hero-tag {
     display: inline-flex;
     align-items: center;
@@ -61,6 +80,31 @@
 
   .hero-tag code {
     font-size: inherit;
+  }
+
+  .hero-copy {
+    color: var(--fg-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 150ms var(--ease);
+  }
+
+  .hero-copy:hover {
+    color: var(--fg-secondary);
+  }
+
+  .hero-copy:active {
+    color: var(--green);
+  }
+
+  .copy-icon {
+    width: 12px;
+    height: 12px;
   }
 
   .hero-dot {
@@ -185,5 +229,6 @@
   @media (max-width: 640px) {
     .hero { padding: calc(var(--nav-h) + var(--sp-12)) 0 var(--sp-12); }
     .hero-sub br { display: none; }
+    .hero-logo { width: 140px; }
   }
 </style>

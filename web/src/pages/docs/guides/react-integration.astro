@@ -1,14 +1,22 @@
 ---
 import DocsLayout from '../../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../../components/docs/DocsToc.astro'
 import CodeBlock from '../../../components/docs/CodeBlock.astro'
 import Callout from '../../../components/docs/Callout.astro'
 
 const currentPage = '/docs/guides/react-integration'
+
+const headings = [
+  { id: 'setup', text: 'Setup', level: 2 },
+  { id: 'use-inval', text: 'useInval Hook', level: 2 },
+  { id: 'example', text: 'Example', level: 2 },
+]
 ---
 
 <DocsLayout title="React Integration — Inval Guides" description="Use Inval with React components and hooks.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="docs-page">
     <nav class="breadcrumb">
@@ -26,7 +34,7 @@ const currentPage = '/docs/guides/react-integration'
       <h2>The Pattern</h2>
       <p>Inval is framework-agnostic. With React, you create Inval nodes outside components (or in refs) and subscribe to changes to trigger re-renders.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="useInval.ts"
         lang="typescript"
         code={`import { useRef, useEffect, useState } from 'react'
@@ -61,7 +69,7 @@ function useInvalNode<T>(computedNode: ComputedNode<T>) {
     <section id="example">
       <h2>Example: Responsive Chart</h2>
 
-      <CodeBlock 
+      <CodeBlock
         filename="Chart.tsx"
         lang="typescript"
         code={`import { useRef, useEffect, useState } from 'react'

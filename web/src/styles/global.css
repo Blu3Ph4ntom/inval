@@ -1,6 +1,12 @@
-@import './tokens.css';
+@import "./tokens.css";
 
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 html {
   scroll-behavior: smooth;
@@ -30,10 +36,48 @@ a {
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.92em;
+  font-size: 0.88em;
+  padding: 2px 7px;
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--fg);
+  font-weight: 450;
+  letter-spacing: 0.01em;
+  transition: all var(--duration) var(--ease);
 }
 
-img { max-width: 100%; display: block; }
+code:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-hover);
+}
+
+/* Reset code styles inside codeblocks — let CodeBlock component handle styling */
+.codeblock code,
+.codeblock .shiki code,
+.codeblock .shiki code span,
+.codeblock pre code {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit !important;
+  transition: none !important;
+}
+
+.codeblock code:hover {
+  background: none !important;
+  border-color: transparent !important;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
 
 /* Utility */
 .wrap {
@@ -52,7 +96,9 @@ img { max-width: 100%; display: block; }
 [data-reveal] {
   opacity: 0;
   transform: translateY(12px);
-  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.5s var(--ease);
 }
 
 [data-reveal].is-visible {
@@ -64,7 +110,9 @@ img { max-width: 100%; display: block; }
 [data-stagger] > * {
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+  transition:
+    opacity 0.4s var(--ease),
+    transform 0.4s var(--ease);
 }
 
 [data-stagger].is-visible > * {
@@ -72,15 +120,33 @@ img { max-width: 100%; display: block; }
   transform: none;
 }
 
-[data-stagger].is-visible > :nth-child(1) { transition-delay: 0ms; }
-[data-stagger].is-visible > :nth-child(2) { transition-delay: 60ms; }
-[data-stagger].is-visible > :nth-child(3) { transition-delay: 120ms; }
-[data-stagger].is-visible > :nth-child(4) { transition-delay: 180ms; }
-[data-stagger].is-visible > :nth-child(5) { transition-delay: 240ms; }
-[data-stagger].is-visible > :nth-child(6) { transition-delay: 300ms; }
-[data-stagger].is-visible > :nth-child(7) { transition-delay: 360ms; }
-[data-stagger].is-visible > :nth-child(8) { transition-delay: 420ms; }
-[data-stagger].is-visible > :nth-child(9) { transition-delay: 480ms; }
+[data-stagger].is-visible > :nth-child(1) {
+  transition-delay: 0ms;
+}
+[data-stagger].is-visible > :nth-child(2) {
+  transition-delay: 60ms;
+}
+[data-stagger].is-visible > :nth-child(3) {
+  transition-delay: 120ms;
+}
+[data-stagger].is-visible > :nth-child(4) {
+  transition-delay: 180ms;
+}
+[data-stagger].is-visible > :nth-child(5) {
+  transition-delay: 240ms;
+}
+[data-stagger].is-visible > :nth-child(6) {
+  transition-delay: 300ms;
+}
+[data-stagger].is-visible > :nth-child(7) {
+  transition-delay: 360ms;
+}
+[data-stagger].is-visible > :nth-child(8) {
+  transition-delay: 420ms;
+}
+[data-stagger].is-visible > :nth-child(9) {
+  transition-delay: 480ms;
+}
 
 /* Focus */
 :focus-visible {
@@ -90,13 +156,20 @@ img { max-width: 100%; display: block; }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 
 @media (max-width: 768px) {
-  .wrap, .wrap-sm { padding: 0 var(--sp-4); }
+  .wrap,
+  .wrap-sm {
+    padding: 0 var(--sp-4);
+  }
 }

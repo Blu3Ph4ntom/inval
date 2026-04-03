@@ -1,14 +1,22 @@
 ---
 import DocsLayout from '../../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../../components/docs/DocsToc.astro'
 import CodeBlock from '../../../components/docs/CodeBlock.astro'
 import Callout from '../../../components/docs/Callout.astro'
 
 const currentPage = '/docs/guides/virtualized-lists'
+
+const headings = [
+  { id: 'overview', text: 'Overview', level: 2 },
+  { id: 'implementation', text: 'Implementation', level: 2 },
+  { id: 'usage', text: 'Usage', level: 2 },
+]
 ---
 
 <DocsLayout title="Virtualized Lists — Inval Guides" description="Build variable-height virtualized lists with Inval.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="docs-page">
     <nav class="breadcrumb">
@@ -32,7 +40,7 @@ const currentPage = '/docs/guides/virtualized-lists'
       <h2>The Inval Solution</h2>
       <p>Model row heights as computed nodes that depend on viewport width and content. When width changes, only affected rows recompute. Scroll position stays stable.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="virtualized-list.ts"
         lang="typescript"
         code={`import { input, node } from '@blu3ph4ntom/inval'
@@ -109,7 +117,7 @@ scrollTop.set(500)
       <h2>Framework Integration</h2>
       <p>Connect Inval to your rendering framework. Here's a React pattern:</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="VirtualList.tsx"
         lang="typescript"
         code={`import { input, node } from '@blu3ph4ntom/inval'

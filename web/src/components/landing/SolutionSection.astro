@@ -1,26 +1,7 @@
 ---
----
+import CodeBlock from '../docs/CodeBlock.astro'
 
-<section class="sect" id="solution">
-  <div class="wrap">
-
-    <p class="sect-eyebrow" data-reveal>The Solution</p>
-    <h2 class="sect-heading" data-reveal>Declare what depends on what.</h2>
-    <p class="sect-body" data-reveal>
-      Inval models your layout as a directed acyclic graph. Inputs feed computed nodes.
-      Change one value — only its descendants recompute.
-    </p>
-
-    <div class="soln-layout" data-reveal>
-      <div class="code-panel">
-        <div class="code-top">
-          <span>dashboard.ts</span>
-          <button class="copy-btn" x-data="{ copied: false }" @click="navigator.clipboard.writeText($el.closest('.code-panel').querySelector('code').textContent); copied = true; setTimeout(() => copied = false, 1800)">
-            <span x-show="!copied">Copy</span>
-            <span x-show="copied" style="color:var(--fg)">Copied</span>
-          </button>
-        </div>
-        <pre><code>{`import { input, node, why } from '@blu3ph4ntom/inval'
+const exampleCode = `import { input, node, why } from '@blu3ph4ntom/inval'
 
 // Leaf inputs — external world writes here
 const width  = input(800)
@@ -38,8 +19,21 @@ area.get()       // 480 000 — cached, zero cost
 width.set(1000)
 area.get()       // 600 000 — only area recomputed
 
-why(area)        // ['area', 'width']`}</code></pre>
-      </div>
+why(area)        // ['area', 'width']`
+---
+
+<section class="sect" id="solution">
+  <div class="wrap">
+
+    <p class="sect-eyebrow" data-reveal>The Solution</p>
+    <h2 class="sect-heading" data-reveal>Declare what depends on what.</h2>
+    <p class="sect-body" data-reveal>
+      Inval models your layout as a directed acyclic graph. Inputs feed computed nodes.
+      Change one value — only its descendants recompute.
+    </p>
+
+    <div class="soln-layout" data-reveal>
+      <CodeBlock code={exampleCode} filename="dashboard.ts" lang="typescript" />
 
       <div class="points" data-stagger>
         <div class="point">
@@ -95,7 +89,6 @@ why(area)        // ['area', 'width']`}</code></pre>
     margin-bottom: var(--sp-12);
   }
 
-  /* Two-column layout */
   .soln-layout {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
@@ -103,53 +96,6 @@ why(area)        // ['area', 'width']`}</code></pre>
     align-items: start;
   }
 
-  /* Code panel */
-  .code-panel {
-    background: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .code-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--sp-3) var(--sp-4);
-    border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--fg-muted);
-  }
-
-  .copy-btn {
-    background: none;
-    border: none;
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--fg-muted);
-    cursor: pointer;
-    padding: 0;
-    transition: color var(--duration) var(--ease);
-  }
-
-  .copy-btn:hover { color: var(--fg-secondary); }
-
-  .code-panel pre {
-    padding: var(--sp-5);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .code-panel code {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    line-height: 1.8;
-    color: var(--fg-secondary);
-    white-space: pre;
-  }
-
-  /* Benefit points */
   .points {
     display: flex;
     flex-direction: column;

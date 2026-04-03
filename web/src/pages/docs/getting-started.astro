@@ -1,14 +1,22 @@
 ---
 import DocsLayout from '../../layouts/DocsLayout.astro'
 import DocsSidebar from '../../components/docs/DocsSidebar.astro'
+import DocsToc from '../../components/docs/DocsToc.astro'
 import CodeBlock from '../../components/docs/CodeBlock.astro'
 import Callout from '../../components/docs/Callout.astro'
 
 const currentPage = '/docs/getting-started'
+
+const headings = [
+  { id: 'installation', text: 'Installation', level: 2 },
+  { id: 'quick-start', text: 'Quick Start', level: 2 },
+  { id: 'your-first-graph', text: 'Your First Graph', level: 2 },
+]
 ---
 
 <DocsLayout title="Getting Started — Inval Docs" description="Install Inval and build your first dependency graph.">
   <DocsSidebar slot="sidebar" currentPage={currentPage} />
+  <DocsToc slot="toc" headings={headings} />
 
   <div class="doc-page">
     <nav class="breadcrumb">
@@ -24,7 +32,7 @@ const currentPage = '/docs/getting-started'
       <h2 class="doc-h2">Installation</h2>
       <p class="doc-p">Install via your preferred package manager:</p>
 
-      <CodeBlock 
+      <CodeBlock
         lang="bash"
         code={`npm install @blu3ph4ntom/inval
 
@@ -37,7 +45,7 @@ pnpm add @blu3ph4ntom/inval`}
 
       <p class="doc-p">Or use the IIFE bundle directly in a script tag:</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="index.html"
         lang="html"
         code={`<script src="https://unpkg.com/@blu3ph4ntom/inval/dist/inval.iife.js"><\/script>
@@ -58,7 +66,7 @@ pnpm add @blu3ph4ntom/inval`}
 
       <h3 class="doc-h3">Step 1: Import the API</h3>
 
-      <CodeBlock 
+      <CodeBlock
         filename="step1.ts"
         lang="typescript"
         code={`import { input, node } from '@blu3ph4ntom/inval'`}
@@ -67,7 +75,7 @@ pnpm add @blu3ph4ntom/inval`}
       <h3 class="doc-h3">Step 2: Create input nodes</h3>
       <p class="doc-p">Input nodes are leaf nodes. They hold values that external code sets.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="step2.ts"
         lang="typescript"
         code={`const width = input(800)
@@ -80,7 +88,7 @@ height.get()  // 600`}
       <h3 class="doc-h3">Step 3: Create a computed node</h3>
       <p class="doc-p">Computed nodes declare their dependencies and compute lazily.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="step3.ts"
         lang="typescript"
         code={`const area = node({
@@ -93,7 +101,7 @@ area.get()  // 480000 — computes on first access`}
 
       <h3 class="doc-h3">Step 4: Change an input and observe</h3>
 
-      <CodeBlock 
+      <CodeBlock
         filename="step4.ts"
         lang="typescript"
         code={`area.get()  // 480000 — cached, zero cost
@@ -111,7 +119,7 @@ area.get()  // 600000 — recomputes because width changed`}
       <h2 class="doc-h2">Your First Graph</h2>
       <p class="doc-p">Let's build something more realistic — a dashboard layout with dependent widgets.</p>
 
-      <CodeBlock 
+      <CodeBlock
         filename="dashboard.ts"
         lang="typescript"
         code={`import { input, node, batch } from '@blu3ph4ntom/inval'
@@ -260,11 +268,20 @@ const changed = batch(() => {
 
   .doc-code {
     font-family: var(--font-mono);
-    font-size: 0.88em;
+    font-size: 0.86em;
     color: var(--fg);
     background: var(--bg-muted);
-    padding: 1px 6px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-weight: 450;
+    letter-spacing: 0.01em;
+    transition: all var(--duration) var(--ease);
+  }
+
+  .doc-code:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-hover);
   }
 
   strong { color: var(--fg); font-weight: 500; }
