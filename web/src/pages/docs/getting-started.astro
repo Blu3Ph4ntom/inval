@@ -4,6 +4,7 @@ import DocsSidebar from '../../components/docs/DocsSidebar.astro'
 import DocsToc from '../../components/docs/DocsToc.astro'
 import CodeBlock from '../../components/docs/CodeBlock.astro'
 import Callout from '../../components/docs/Callout.astro'
+import { withBase } from '../../utils/base'
 
 const currentPage = '/docs/getting-started'
 
@@ -20,7 +21,7 @@ const headings = [
 
   <div class="doc-page">
     <nav class="breadcrumb">
-      <a href="/docs/">Docs</a>
+      <a href={withBase('/docs/')}>Docs</a>
       <span class="bc-sep">/</span>
       <span>Getting Started</span>
     </nav>
@@ -169,11 +170,11 @@ const changed = batch(() => {
     </section>
 
     <div class="page-nav">
-      <a href="/docs/">
+      <a href={withBase('/docs/')}>
         <span>←</span>
         <span>Introduction</span>
       </a>
-      <a href="/docs/core-concepts">
+      <a href={withBase('/docs/core-concepts')}>
         <span>Core Concepts</span>
         <span>→</span>
       </a>

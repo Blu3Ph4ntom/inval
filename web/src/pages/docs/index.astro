@@ -4,6 +4,7 @@ import DocsSidebar from '../../components/docs/DocsSidebar.astro'
 import DocsToc from '../../components/docs/DocsToc.astro'
 import CodeBlock from '../../components/docs/CodeBlock.astro'
 import Callout from '../../components/docs/Callout.astro'
+import { withBase } from '../../utils/base'
 
 const currentPage = '/docs/'
 
@@ -21,7 +22,7 @@ const headings = [
 
   <div class="doc-page">
     <nav class="breadcrumb">
-      <a href="/docs/">Docs</a>
+      <a href={withBase('/docs/')}>Docs</a>
       <span class="bc-sep">/</span>
       <span>Introduction</span>
     </nav>
@@ -112,7 +113,7 @@ why(area)         // ['area', 'width'] — trace invalidation path`}
     <section id="next-steps">
       <h2 class="doc-h2">Next Steps</h2>
       <div class="next-steps">
-        <a href="/docs/getting-started" class="next-step-card">
+        <a href={withBase('/docs/getting-started')} class="next-step-card">
           <span class="next-step-label">Next</span>
           <h3 class="doc-h3">Getting Started →</h3>
           <p class="doc-p">Install Inval and build your first dependency graph in 5 minutes.</p>
@@ -122,7 +123,7 @@ why(area)         // ['area', 'width'] — trace invalidation path`}
 
     <div class="page-nav">
       <div></div>
-      <a href="/docs/getting-started">
+        <a href={withBase('/docs/getting-started')}>
         <span>Getting Started</span>
         <span>→</span>
       </a>

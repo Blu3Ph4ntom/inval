@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../../utils/base'
+
 export interface Props {
   currentPage: string
 }
@@ -61,8 +63,8 @@ function active(href: string) {
 
 <div class="sidebar">
   <div class="sidebar-header">
-    <a href="/" class="sidebar-brand" aria-label="Inval Home">
-      <img src="/logo.svg" alt="inval" class="sidebar-logo" width="90" height="20" />
+    <a href={withBase('/')} class="sidebar-brand" aria-label="Inval Home">
+      <img src={withBase('/logo.svg')} alt="inval" class="sidebar-logo" width="90" height="20" />
     </a>
     <span class="sidebar-version">v0.1.1</span>
   </div>
@@ -75,7 +77,7 @@ function active(href: string) {
           {section.items.map(item => (
             <li>
               <a
-                href={item.href}
+                href={withBase(item.href)}
                 class:list={['sidebar-link', { 'is-active': active(item.href) }]}
               >
                 {item.label}

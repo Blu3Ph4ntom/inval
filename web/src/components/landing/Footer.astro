@@ -1,25 +1,29 @@
+---
+import { withBase } from '../../utils/base'
+---
+
 <footer class="footer">
   <div class="wrap footer-inner">
 
     <div class="footer-brand">
-      <a href="/" class="footer-logo">inval</a>
+      <a href={withBase('/')} class="footer-logo">inval</a>
       <p class="footer-tagline">Deterministic, incremental layout invalidation.</p>
     </div>
 
     <nav class="footer-nav">
       <div class="footer-col">
         <p class="footer-col-head">Docs</p>
-        <a href="/docs/">Introduction</a>
-        <a href="/docs/getting-started">Getting Started</a>
-        <a href="/docs/api-reference">API Reference</a>
-        <a href="/docs/core-concepts">Core Concepts</a>
+        <a href={withBase('/docs/')}>Introduction</a>
+        <a href={withBase('/docs/getting-started')}>Getting Started</a>
+        <a href={withBase('/docs/api-reference')}>API Reference</a>
+        <a href={withBase('/docs/core-concepts')}>Core Concepts</a>
       </div>
       <div class="footer-col">
         <p class="footer-col-head">Guides</p>
-        <a href="/docs/guides/virtualized-lists">Virtualized Lists</a>
-        <a href="/docs/guides/dashboards">Dashboards</a>
-        <a href="/docs/guides/react-integration">React</a>
-        <a href="/docs/guides/debugging">Debugging</a>
+        <a href={withBase('/docs/guides/virtualized-lists')}>Virtualized Lists</a>
+        <a href={withBase('/docs/guides/dashboards')}>Dashboards</a>
+        <a href={withBase('/docs/guides/react-integration')}>React</a>
+        <a href={withBase('/docs/guides/debugging')}>Debugging</a>
       </div>
       <div class="footer-col">
         <p class="footer-col-head">Project</p>

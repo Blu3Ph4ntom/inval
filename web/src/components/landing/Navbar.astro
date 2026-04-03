@@ -1,18 +1,22 @@
+---
+import { withBase } from '../../utils/base'
+---
+
 <header class="nav" x-data="{ open: false }">
   <div class="wrap nav-inner">
-    <a href="/" class="nav-brand" aria-label="Inval Home">
-      <img src="/logo.svg" alt="inval" class="nav-logo" width="110" height="24" />
+    <a href={withBase('/')} class="nav-brand" aria-label="Inval Home">
+      <img src={withBase('/logo.svg')} alt="inval" class="nav-logo" width="110" height="24" />
     </a>
 
     <nav class="nav-links" :class="{ 'is-open': open }">
       <a href="#features">Features</a>
       <a href="#benchmarks">Performance</a>
-      <a href="/docs/">Docs</a>
+      <a href={withBase('/docs/')}>Docs</a>
       <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener">GitHub</a>
     </nav>
 
     <div class="nav-actions">
-      <a href="/docs/getting-started" class="nav-cta">Get Started</a>
+      <a href={withBase('/docs/getting-started')} class="nav-cta">Get Started</a>
       <button class="nav-burger" @click="open = !open" :aria-expanded="open" aria-label="Menu">
         <span></span>
         <span></span>

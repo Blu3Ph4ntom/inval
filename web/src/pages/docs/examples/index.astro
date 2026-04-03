@@ -4,6 +4,7 @@ import DocsSidebar from '../../../components/docs/DocsSidebar.astro'
 import DocsToc from '../../../components/docs/DocsToc.astro'
 import CodeBlock from '../../../components/docs/CodeBlock.astro'
 import Callout from '../../../components/docs/Callout.astro'
+import { withBase } from '../../../utils/base'
 
 const currentPage = '/docs/examples/'
 
@@ -20,7 +21,7 @@ const headings = [
 
   <div class="docs-page">
     <nav class="breadcrumb">
-      <a href="/docs/">Docs</a>
+      <a href={withBase('/docs/')}>Docs</a>
       <span>/</span>
       <span>Examples</span>
     </nav>
@@ -230,7 +231,7 @@ columnWidth.get()  // 304 (single recomputation)`}
     </section>
 
     <div class="page-nav">
-      <a href="/docs/guides/debugging" class="page-nav-prev">
+      <a href={withBase('/docs/guides/debugging')} class="page-nav-prev">
         <span>←</span>
         <span>Debugging</span>
       </a>

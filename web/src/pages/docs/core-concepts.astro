@@ -4,6 +4,7 @@ import DocsSidebar from '../../components/docs/DocsSidebar.astro'
 import DocsToc from '../../components/docs/DocsToc.astro'
 import CodeBlock from '../../components/docs/CodeBlock.astro'
 import Callout from '../../components/docs/Callout.astro'
+import { withBase } from '../../utils/base'
 
 const currentPage = '/docs/core-concepts'
 
@@ -23,7 +24,7 @@ const headings = [
 
   <div class="doc-page">
     <nav class="breadcrumb">
-      <a href="/docs/">Docs</a>
+      <a href={withBase('/docs/')}>Docs</a>
       <span class="bc-sep">/</span>
       <span>Core Concepts</span>
     </nav>
@@ -239,11 +240,11 @@ sum.get()   // recomputes once`}
     </section>
 
     <div class="page-nav">
-      <a href="/docs/getting-started">
+      <a href={withBase('/docs/getting-started')}>
         <span>←</span>
         <span>Getting Started</span>
       </a>
-      <a href="/docs/api-reference">
+      <a href={withBase('/docs/api-reference')}>
         <span>API Reference</span>
         <span>→</span>
       </a>

@@ -1,3 +1,7 @@
+---
+import { withBase } from '../../utils/base'
+---
+
 <section class="cta-sect">
   <div class="wrap">
     <div class="cta-box" data-reveal>
@@ -5,7 +9,7 @@
       <h2 class="cta-h">Deterministic layouts.<br />No guesswork.</h2>
       <p class="cta-sub">Drop inval into any project. Zero config, zero dependencies.</p>
       <div class="cta-actions">
-        <a href="/docs/getting-started" class="btn-solid">Read the docs</a>
+        <a href={withBase('/docs/getting-started')} class="btn-solid">Read the docs</a>
         <a href="https://github.com/Blu3Ph4ntom/inval" target="_blank" rel="noopener" class="btn-ghost">View on GitHub</a>
       </div>
       <p class="cta-install" x-data="{ copied: false }">
