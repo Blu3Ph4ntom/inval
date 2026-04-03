@@ -11,7 +11,7 @@ const { code, filename, lang = "typescript" } = Astro.props;
 const codeId = `code-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
-<div class="code-block" x-data="{ copied: false }">
+<div class="code-block" id={codeId} x-data="{ copied: false }">
   <div class="code-header">
     <div class="code-header-left">
       {filename && <span class="code-filename">{filename}</span>}
@@ -51,9 +51,7 @@ const codeId = `code-${Math.random().toString(36).slice(2, 9)}`;
       <span x-text="copied ? 'Copied' : 'Copy'"></span>
     </button>
   </div>
-  <div class="code-body" id={codeId}>
-    <Code code={code.trim()} lang={lang} theme="github-dark" />
-  </div>
+  <Code code={code.trim()} lang={lang} theme="github-dark" />
 </div>
 
 <style is:global>
@@ -129,11 +127,7 @@ const codeId = `code-${Math.random().toString(36).slice(2, 9)}`;
     height: 14px;
   }
 
-  .code-body {
-    background: #0d1117 !important;
-  }
-
-  .code-body pre {
+  .code-block pre {
     margin: 0 !important;
     padding: 1.5rem 0 !important;
     background: transparent !important;
@@ -142,17 +136,17 @@ const codeId = `code-${Math.random().toString(36).slice(2, 9)}`;
     overflow-x: auto;
   }
 
-  .code-body code {
+  .code-block code {
     display: grid;
     counter-reset: line;
   }
 
-  .code-body .line {
+  .code-block .line {
     padding: 0 1.25rem;
     border-left: 3px solid transparent;
   }
 
-  .code-body .line::before {
+  .code-block .line::before {
     counter-increment: line;
     content: counter(line);
     display: inline-block;
@@ -164,7 +158,7 @@ const codeId = `code-${Math.random().toString(36).slice(2, 9)}`;
     font-size: 12px;
   }
 
-  .code-body .line:hover {
+  .code-block .line:hover {
     background: #161b22;
   }
 </style>
